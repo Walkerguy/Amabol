@@ -1,2 +1,2 @@
 # Amabol
-Web retail giant. Project for Solution 
+Web retail giant. Project for Solution Architecture.
