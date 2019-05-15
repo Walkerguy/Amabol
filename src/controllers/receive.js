@@ -1,6 +1,6 @@
 var amqp = require('amqplib/callback_api');
 
-exports.listen = amqp.connect('amqp://localhost', function(error0, connection) {
+exports.listen = function(queue) {amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
       throw error0;
     }
@@ -8,8 +8,6 @@ exports.listen = amqp.connect('amqp://localhost', function(error0, connection) {
       if (error1) {
         throw error1;
       }
-
-      var queue = 'hello';
 
       channel.assertQueue(queue, {
         durable: false
@@ -24,3 +22,4 @@ exports.listen = amqp.connect('amqp://localhost', function(error0, connection) {
       });
     });
   });
+}
