@@ -38,7 +38,7 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
 }
 
 function handleMessage(msg){
-    if(msg.fields.routingKey.contains("inventory")){
+    if(msg.fields.routingKey == "hello"){
         handleHelloMessage(msg);
     }
     if(msg.fields.routingKey == "doei"){
