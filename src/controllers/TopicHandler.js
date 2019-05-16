@@ -26,10 +26,6 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
             channel.bindQueue(q.queue, exchange, topics[i]);
           }
     
-        //   topics.forEach(function(key) {
-        //     channel.bindQueue(q.queue, exchange, key);
-        //   });
-    
           channel.consume(q.queue, function(msg) {
             handleMessage(msg)
             console.log(" [x] %s:'%s'", msg.fields.routingKey, msg.content.toString());
