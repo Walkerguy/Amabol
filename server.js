@@ -3,6 +3,9 @@ var app = express();
 const cors = require('cors');
 var bodyParser = require('body-parser');
 
+var mongodb = require('./src/config/mongo.db');
+var environment = require('./src/config/environment');
+
 // All messaging equipment here.
 var MessageHandler = require("./src/messaging/MessageHandler");
 var MessagePublisher = require("./src/messaging/MessagePublisher");
@@ -32,7 +35,7 @@ var server = app.listen(8888, function () {
 
   // Add message listeners here.
   MessageHandler.listen("logs");
-  TopicHandler.listen("topic_logs",Topics);
+  TopicHandler.listen("topic_exchange",Topics);
 
   console.log('[SERVER] Listening at %s:%s.', host, port);
 

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const OrderSchema = new Schema({
     Id: {
         type: String,
-        required: true
+        //required: true
     },
     // Who made the order.
     buyer:{
