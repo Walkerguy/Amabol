@@ -9,12 +9,12 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
           throw error1;
         }
         //var exchange = 'topic_logs';
-    
+
         channel.assertExchange(exchange, 'topic', {
           durable: false
         });
-    
-        channel.assertQueue('', {
+
+        channel.assertQueue('account_queue', {
           exclusive: true
         }, function(error2, q) {
           if (error2) {
@@ -25,7 +25,7 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
           for (i=0; i<topics.length; i++) {
             channel.bindQueue(q.queue, exchange, topics[i]);
           }
-    
+
           channel.consume(q.queue, function(msg) {
             handleMessage(msg)
             console.log(" [x] %s:'%s'", msg.fields.routingKey, msg.content.toString());
@@ -38,10 +38,10 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
 }
 
 function handleMessage(msg){
-    if(msg.fields.routingKey == "hello"){
-        handleHelloMessage(msg);
+    if(msg.fields.routingKey.contains("order.create")){
+        handleCreateOrder(msg.content.toString());
     }
-    if(msg.fields.routingKey == "doei"){
+    if(msg.fields.routingKey.contains("doei")){
         handleDoeiMessage(msg);
     }
 }

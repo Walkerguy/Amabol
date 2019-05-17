@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 
-//basic sending en recieving 
+//basic sending en recieving
 var sendController = require("./src/controllers/send");
 var receiveController = require("./src/controllers/receive");
 //publishing and subscribing
@@ -11,7 +11,7 @@ var MessagePublisher = require("./src/controllers/MessagePublisher");
 //topic based messaging
 var TopicHandler = require("./src/controllers/TopicHandler");
 var TopicPublisher = require("./src/controllers/TopicPublisher");
-var Topics = ['#.inventory.#',"cool"] //topics to listen too
+var Topics = ['#.account.#','#.order.#'] //topics to listen too
 
 
 var inventoryroutes= require('./src/routes/Inventory_routes');
