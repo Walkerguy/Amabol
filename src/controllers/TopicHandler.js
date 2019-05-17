@@ -8,13 +8,12 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
         if (error1) {
           throw error1;
         }
-        //var exchange = 'topic_logs';
     
         channel.assertExchange(exchange, 'topic', {
           durable: false
         });
     
-        channel.assertQueue('', {
+        channel.assertQueue('shipment_queue', {
           exclusive: true
         }, function(error2, q) {
           if (error2) {
@@ -38,18 +37,18 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
 }
 
 function handleMessage(msg){
-    if(msg.fields.routingKey == "hello"){
-        handleHelloMessage(msg);
+    if(msg.fields.routingKey.contains("inventory.create")){
+        handleInventoryCreate(msg);
     }
     if(msg.fields.routingKey == "doei"){
         handleDoeiMessage(msg);
     }
 }
 
-function handleHelloMessage(msg){
+function handleInventoryCreate(msg){
   console.log(" [x] Recieved topic" + msg.fields.routingKey + ": %s", msg.content.toString());
 }
 
 function handleDoeiMessage(msg){
-    console.log(" [x] Recieved topic" + msg.fields.routingKey + ": %s", msg.content.toString());
-  }
+  console.log(" [x] Recieved topic" + msg.fields.routingKey + ": %s", msg.content.toString());
+}
