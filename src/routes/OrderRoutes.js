@@ -4,36 +4,45 @@ var routes = express.Router();
 var Account = require('../models/Account');
 var Order = require('../models/Order');
 var Product = require('../models/Product');
-var TopicPublisher = require('../controllers/TopicPublisher');
+var TopicPublisher = require('../messaging/TopicPublisher');
 
-routes.get('/products', function (req, res) {
-    res.contentType('application/json');
+routes.post('/', function(req, res) {
+    const newOrder = req.body;
 
-    res.status(200).json(posts);
+    // Important, create a unique id here.
+    newOrder.id = require('uuid/v1');
 
-    // Product.find()
-    //     .then(function (products) {
-    //         res.status(200).json(products);
-    //         console.log(products);
-    //     })
-    //     .catch((error) => {
-    //         res.status(400).json(error);
-    //     });
+    Order.create(newOrder)
+    .then(order => res.send(order))
+    .catch(next);
 });
 
-routes.post('/products', function(req, res) {
-    var new_product = new Product(req.body);
-
-    TopicPublisher.sendMessageWithTopic(new_product.toString(),"inventory.create");
-    // new_product.save(function(err, task) {
-    //   if (err)
-    //     res.send(err);
-    //     res.json(task);
-    // });
-
-    res.json(req.body);
+routes.get('/', function (req, res) {
+    Order.find({})
+        .then((orders) => res.status(200).send(orders))
+        .catch(next);
 });
 
+routes.get('/:id', function (req, res) {
+        Order.findOne({id: req.params.id})
+        .then((order) => res.status(200).send(order))
+        .catch(next);
+});
 
+routes.put('/', function (req, res) {
+    const orderId = req.params.id;
+    const updatedOrder = req.body;
+
+    Order.findOneAndUpdate({id: orderId}, updatedOrder)
+    .then(() => Order.findById({_id:orderId}))
+    .then(order => res.send(order))
+    .catch(next);
+});
+
+routes.delete('/', function (req, res) {
+    Order.findOneAndDelete({id: req.params.id})
+        .then((order) => res.status(200).send(order))
+        .catch(next);
+});
 
 module.exports = routes;

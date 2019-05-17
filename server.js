@@ -4,11 +4,11 @@ const cors = require('cors');
 var bodyParser = require('body-parser');
 
 // All messaging equipment here.
-var MessageHandler = require("./src/controllers/MessageHandler");
-var MessagePublisher = require("./src/controllers/MessagePublisher");
+var MessageHandler = require("./src/messaging/MessageHandler");
+var MessagePublisher = require("./src/messaging/MessagePublisher");
 
-var TopicHandler = require("./src/controllers/TopicHandler");
-var TopicPublisher = require("./src/controllers/TopicPublisher");
+var TopicHandler = require("./src/messaging/TopicHandler");
+var TopicPublisher = require("./src/messaging/TopicPublisher");
 var Topics = ['#.inventory.#',"cool"] // Topics.
 
 var OrderRoutes = require('./src/routes/OrderRoutes');

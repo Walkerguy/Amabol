@@ -9,12 +9,14 @@ exports.sendMessage = function(req,res){
         if (error1) {
           throw error1;
         }
+
         var exchange = 'logs';
         var msg = req.params.text || 'Hello World!';
     
         channel.assertExchange(exchange, 'fanout', {
           durable: false
         });
+        
         channel.publish(exchange, '', Buffer.from(msg));
         console.log(" [x] Published %s", msg);
         res.send('<h1> Published: ' + msg + '</h1>');
