@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var mongodb = require('./src/config/mongo.db');
 
 //basic sending en recieving 
 var sendController = require("./src/controllers/send");
@@ -14,7 +15,7 @@ var TopicPublisher = require("./src/controllers/TopicPublisher");
 var Topics = ['#.inventory.#',"cool"] //topics to listen too
 
 
-var inventoryroutes= require('./src/routes/Inventory_routes');
+var Shoppingcartroutes= require('./src/routes/Shoppingcart_routes');
 
 app.use(bodyParser.urlencoded({
   'extended': 'true'
@@ -35,17 +36,16 @@ app.get('/send/:text', sendController.sendMessage);
 app.get('/publish', MessagePublisher.sendMessage);
 app.get('/publish/:text', MessagePublisher.sendMessage);
 
-//app.get('/topic/:text/:topic', TopicPublisher.sendMessageWithTopic);
-
-app.use('', inventoryroutes);
+app.use('', Shoppingcartroutes);
 
 var server = app.listen(8888, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  receiveController.listen("hello");
-  MessageHandler.listen("logs");
-  TopicHandler.listen("topic_logs",Topics);
+  //receiveController.listen("hello");
+  //MessageHandler.listen("logs");
+  //TopicHandler.listen("topic_logs",Topics);
+  TopicHandler.listen("topic_exchange",Topics);
 
   console.log('Example app listening at http://%s:%s', host, port);
 });
