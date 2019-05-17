@@ -37,13 +37,13 @@ app.get('/publish/:text', MessagePublisher.sendMessage);
 
 //app.get('/topic/:text/:topic', TopicPublisher.sendMessageWithTopic);
 
-app.use('', inventoryroutes);
+app.get('/', function (req, res) {
 
 var server = app.listen(8888, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  receiveController.listen("hello");
+  // Add listeners here.
   MessageHandler.listen("logs");
   TopicHandler.listen("topic_logs",Topics);
 

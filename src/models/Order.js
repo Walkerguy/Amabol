@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const OrderSchema = new Schema({
+    Id: {
+        type: String,
+        required: true
+    },
     // Who made the order.
     buyer:{
         type: Schema.Types.ObjectId,
