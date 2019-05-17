@@ -1,49 +1,41 @@
 var express = require('express');
 var app = express();
+const cors = require('cors');
 var bodyParser = require('body-parser');
 
-//publishing and subscribing
+// All messaging equipment here.
 var MessageHandler = require("./src/controllers/MessageHandler");
 var MessagePublisher = require("./src/controllers/MessagePublisher");
-//topic based messaging
+
 var TopicHandler = require("./src/controllers/TopicHandler");
 var TopicPublisher = require("./src/controllers/TopicPublisher");
-var Topics = ['#.inventory.#',"cool"] //topics to listen too
-
+var Topics = ['#.inventory.#',"cool"] // Topics.
 
 var OrderRoutes = require('./src/routes/OrderRoutes');
 
-app.use(bodyParser.urlencoded({
-  'extended': 'true'
-})); // parse application/x-www-form-urlencoded
-app.use(bodyParser.json()); // parse application/json
-app.use(bodyParser.json({
-  type: 'application/vnd.api+json'
-})); // parse application/vnd.api+json as json
-
+app.use(cors());
+app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
-  res.send('<h1>Hello World from Nodejs!</h1>');
+  res.send('<h1>Order management service [ONLINE].</h1>');
 });
 
+// Send out custom messages.
 app.get('/publish', MessagePublisher.sendMessage);
 app.get('/publish/:text', MessagePublisher.sendMessage);
 
-//app.get('/topic/:text/:topic', TopicPublisher.sendMessageWithTopic);
-
-app.use('', OrderRoutes);
+app.use('/order', OrderRoutes);
 
 var server = app.listen(8888, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-
+  // Add message listeners here.
   MessageHandler.listen("logs");
   TopicHandler.listen("topic_logs",Topics);
 
-  console.log('Example app listening at http://%s:%s', host, port);
-  
-  const uuidv1 = require('uuid/v1'); 
-  console.log(uuidv1());
+  console.log('[SERVER] Listening at %s:%s.', host, port);
 
+  const uuidv1 = require('uuid/v1'); 
+  console.log("[UUID] " + uuidv1());
 });
