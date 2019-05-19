@@ -6,27 +6,40 @@ var TopicPublisher = require('../controllers/TopicPublisher');
 //get, post, edit, delete,
 
 //
-routes.get('/accounts', function (req, res) {
-    res.contentType('application/json');
-    res.status(200).json(posts);
+routes.get('/account', function (req, res, next) {
+  Account.find({})
+  .then((account) => res.status(200).send(account))
+  .catch(next);
 });
 
-routes.post('/account', function(req, res) {
-    var new_account = new Account(req.body);
-    TopicPublisher.sendMessageWithTopic(new_account.toString(),"account.create");
-    res.json(req.body);
+routes.post('/account', function(req, res ,next) {
+      const accountProps = req.body;
+      Account.create(accountProps)
+      .then((account) => {
+        res.send(account)
+        TopicPublisher.sendMessageWithTopic(new_account.toString(),"account.create");
+      })
+      .catch(next);
 });
 
-routes.put('/account', function(req, res) {
-    var new_account = new Account(req.body);
-    TopicPublisher.sendMessageWithTopic(new_account.toString(),"account.update");
-    res.json(req.body);
+routes.put('/account/:id', function(req, res,next) {
+    const accountProps = req.body;
+    Account.findByIdAndUpdate({_id:req.params.id},accountProps)
+    .then(() => Account.findById({_id:req.params.id}))
+    .then((account) => {
+      res.send(account)
+      TopicPublisher.sendMessageWithTopic(new_account.toString(),"account.update");
+    })
+    .catch(next);
 });
 
-routes.delete('/account', function(req, res) {
-    var new_account = new Account(req.body);
+routes.delete('/account/:id', function(req, res) {
+  Account.findByIdAndRemove({_id:req.params.id})
+  .then((account) => {
+    res.status(204).send(account)
     TopicPublisher.sendMessageWithTopic(new_account.toString(),"account.delete");
-    res.json(req.body);
+  })
+  .catch(next);
 });
 
 module.exports = routes;
