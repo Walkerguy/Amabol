@@ -1,4 +1,5 @@
 var amqp = require('amqplib/callback_api');
+var mongodb = require('./config/mongo.db');
 
 exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
@@ -42,12 +43,20 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
 }
 
 function handleMessage(msg){
-    if(msg.fields.routingKey == "hello"){
-        handleHelloMessage(msg);
+    // if(msg.fields.routingKey == "hello"){
+    //     handleHelloMessage(msg);
+    // }
+    // if(msg.fields.routingKey == "doei"){
+    //     handleDoeiMessage(msg);
+    // }
+
+    if(msg.fields.routingKey === 'account'){
+      handleAccountMessage(msg);
     }
-    if(msg.fields.routingKey == "doei"){
-        handleDoeiMessage(msg);
-    }
+}
+
+function handleAccountMessage (msg) {
+
 }
 
 function handleHelloMessage(msg){
