@@ -2,6 +2,10 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 
+var mongodb = require('./src/config/mongo.db');
+var environment = require('./src/config/environment');
+//const app = require('./app');
+//var environment = require('./config/environment');
 //basic sending en recieving
 var sendController = require("./src/controllers/send");
 var receiveController = require("./src/controllers/receive");
@@ -14,7 +18,7 @@ var TopicPublisher = require("./src/controllers/TopicPublisher");
 var Topics = ['#.account.#','#.order.#'] //topics to listen too
 
 
-var inventoryroutes= require('./src/routes/Inventory_routes');
+var accountroutes= require('./src/routes/Account_routes');
 
 app.use(bodyParser.urlencoded({
   'extended': 'true'
@@ -37,7 +41,7 @@ app.get('/publish/:text', MessagePublisher.sendMessage);
 
 //app.get('/topic/:text/:topic', TopicPublisher.sendMessageWithTopic);
 
-app.use('', inventoryroutes);
+app.use('', accountroutes);
 
 var server = app.listen(8888, function () {
   var host = server.address().address;
