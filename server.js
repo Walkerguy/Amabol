@@ -27,7 +27,7 @@ app.use(bodyParser.json({
 
 
 app.get('/', function (req, res) {
-  res.send('<h1>Hello World from Nodejs!</h1>');
+  res.send('<h1>Hello World from shoppingcart service!</h1>');
 });
 
 app.get('/send', sendController.sendMessage);
