@@ -9,14 +9,14 @@ routes.get('/products', function (req, res) {
 
     res.status(200).json(products);
 
-    // Product.find()
-    //     .then(function (products) {
-    //         res.status(200).json(products);
-    //         console.log(products);
-    //     })
-    //     .catch((error) => {
-    //         res.status(400).json(error);
-    //     });
+    Product.find()
+        .then(function (products) {
+            res.status(200).json(products);
+            console.log(products);
+        })
+        .catch((error) => {
+            res.status(400).json(error);
+        });
 });
 
 routes.get('/products/:id', function (req, res) {
@@ -33,11 +33,12 @@ routes.get('/products/:id', function (req, res) {
 routes.post('/products', function(req, res) {
     var new_product = new Product(req.body);
 
-    // new_product.save(function(err, task) {
-    //   if (err)
-    //     res.send(err);
-    //     res.json(task);
-    // });
+    new_product.save(function(err, task) {
+        if (err){
+            res.send(err);
+        }
+        res.json(task);
+    });
     TopicPublisher.sendMessageWithTopic(new_product.toString(),"inventory.create");
 
     res.json(req.body);
@@ -45,32 +46,27 @@ routes.post('/products', function(req, res) {
 
 routes.update('/products/:id/changeAmount', function(req, res) {
     var id = req.params.id;
-    //var new_product = new Product(req.body);
     var oldAmount;
     
-    // Product.find({ '_id' : ObjectId(req.params.id)})
-    //     .then(function (product) {
-    //         res.status(200).json(product);
-    //         oldAmount = product.amount;
-    //         console.log(product);
-    //     })
-    //     .catch((error) => {
-    //         res.status(400).json(error);
-    //     });
+    Product.find({ '_id' : ObjectId(req.params.id)})
+        .then(function (product) {
+            res.status(200).json(product);
+            oldAmount = product.amount;
+            var msg = { 'id': product.id, 'oldAmount' : oldAmount, 'newAmount' : req.body.amount}
+            TopicPublisher.sendMessageWithTopic(msg,"inventory.update");
+            res.json(req.body);
+            console.log(product);
+        })
+        .catch((error) => {
+            res.status(400).json(error);
+        });
 
-    // Product.findOneAndUpdate({
-    //     query: { _id: ObjectId(id) },
-    //     update: { $set: { amount: req.body.amount } }
-    // });
+    Product.findOneAndUpdate({
+        query: { _id: ObjectId(id) },
+        update: { $set: { amount: req.body.amount } }
+    });
 
-    //var msg = { 'oldAmount' : oldAmount, 'newAmount' : req.body.amount}
-
-    var msg = { 'oldAmount' : 0, 'newAmount' : req.body.amount}
-
-    TopicPublisher.sendMessageWithTopic(new_product.toString(),"inventory.update");
-
-
-    res.json(req.body);
+   
 });
 
 routes.delete('/products/:id', function (req, res) {
