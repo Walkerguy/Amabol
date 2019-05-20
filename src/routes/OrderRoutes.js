@@ -26,23 +26,22 @@ routes.get('/', function (req, res, next) {
 });
 
 routes.get('/:id', function (req, res, next) {
-        Order.findOne({id: req.params.id})
+        Order.findOne({Id: req.params.id})
         .then((order) => res.status(200).send(order))
         .catch(next);
 });
 
-routes.put('/', function (req, res, next) {
+routes.put('/:id', function (req, res, next) {
     const orderId = req.params.id;
     const updatedOrder = req.body;
 
-    Order.findOneAndUpdate({id: orderId}, updatedOrder)
-    .then(() => Order.findById({_id:orderId}))
+    Order.findOneAndUpdate({Id: orderId}, updatedOrder)
     .then(order => res.send(order))
     .catch(next);
 });
 
-routes.delete('/', function (req, res, next) {
-    Order.findOneAndDelete({id: req.params.id})
+routes.delete('/:id', function (req, res, next) {
+    Order.findOneAndDelete({Id: req.params.id})
         .then((order) => res.status(200).send(order))
         .catch(next);
 });
