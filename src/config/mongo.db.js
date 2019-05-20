@@ -10,8 +10,8 @@ console.log(environment.dburl);
 var connection = mongoose.connection
     .once('open', () => console.log('[Database] Connected with MongoDb at ' + environment.env.dbHost + " to database " + environment.env.dbDatabase))
     .on('error', (error) => {
-        console.warn('Warning', error.toString());
-        });
+        console.warn('Warning', error.toString()); 
+    });
 
 // Connectie.
 module.exports = connection;

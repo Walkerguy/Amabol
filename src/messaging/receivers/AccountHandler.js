@@ -11,11 +11,10 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
         //var exchange = 'topic_logs';
     
         channel.assertExchange(exchange, 'topic', {
-          durable: false
+          durable: true
         });
     
-        channel.assertQueue('', {
-          exclusive: true
+        channel.assertQueue('order_queue', {
         }, function(error2, q) {
           if (error2) {
             throw error2;
