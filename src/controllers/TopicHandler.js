@@ -26,11 +26,7 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
           for (i=0; i<topics.length; i++) {
             channel.bindQueue(q.queue, exchange, topics[i]);
           }
-    
-        //   topics.forEach(function(key) {
-        //     channel.bindQueue(q.queue, exchange, key);
-        //   });
-    
+
           channel.consume(q.queue, function(msg) {
             handleMessage(msg)
             console.log(" [x] %s:'%s'", msg.fields.routingKey, msg.content.toString());
@@ -43,13 +39,6 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
 }
 
 function handleMessage(msg){
-    // if(msg.fields.routingKey == "hello"){
-    //     handleHelloMessage(msg);
-    // }
-    // if(msg.fields.routingKey == "doei"){
-    //     handleDoeiMessage(msg);
-    // }
-
     if(msg.fields.routingKey === 'account'){
       handleAccountMessage(msg);
     }
