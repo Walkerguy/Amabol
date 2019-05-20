@@ -15,7 +15,7 @@ var MessagePublisher = require("./src/controllers/MessagePublisher");
 //topic based messaging
 var TopicHandler = require("./src/controllers/TopicHandler");
 var TopicPublisher = require("./src/controllers/TopicPublisher");
-var Topics = ['#.account.#','#.order.#'] //topics to listen too
+var Topics = ['#.order.#'] //topics to listen too
 
 
 var accountroutes= require('./src/routes/Account_routes');

@@ -17,15 +17,15 @@ routes.post('/account', function(req, res ,next) {
       Account.create(accountProps)
       .then((account) => {
         res.send(account)
-        TopicPublisher.sendMessageWithTopic(new_account.toString(),"account.create");
+         TopicPublisher.sendMessageWithTopic(accountProps.toString(),"account.create");
       })
       .catch(next);
 });
 
 routes.put('/account/:id', function(req, res,next) {
     const accountProps = req.body;
-    Account.findByIdAndUpdate({_id:req.params.id},accountProps)
-    .then(() => Account.findById({_id:req.params.id}))
+    Account.findByIdAndUpdate({id:req.params.id},accountProps)
+    .then(() => Account.findById({id:req.params.id}))
     .then((account) => {
       res.send(account)
       TopicPublisher.sendMessageWithTopic(new_account.toString(),"account.update");
@@ -34,7 +34,7 @@ routes.put('/account/:id', function(req, res,next) {
 });
 
 routes.delete('/account/:id', function(req, res) {
-  Account.findByIdAndRemove({_id:req.params.id})
+  Account.findByIdAndRemove({id:req.params.id})
   .then((account) => {
     res.status(204).send(account)
     TopicPublisher.sendMessageWithTopic(new_account.toString(),"account.delete");

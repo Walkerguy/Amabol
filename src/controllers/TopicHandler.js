@@ -38,10 +38,12 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
 }
 
 function handleMessage(msg){
-    if(msg.fields.routingKey.contains("order.create")){
-        handleCreateOrder(msg.content.toString());
+    if(msg.fields.routingKey.contains("order.create"))
+    {
+        handleCreateOrder(msg);
     }
-    if(msg.fields.routingKey.contains("doei")){
+    if(msg.fields.routingKey.contains("doei"))
+    {
         handleDoeiMessage(msg);
     }
 }
