@@ -1,5 +1,6 @@
 var amqp = require('amqplib/callback_api');
 var Account = require('../models/Account');
+var Product = require('../models/Product');
 var uuidv1 = require('uuid/v1');
 
 exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', function(error0, connection) {
@@ -42,8 +43,8 @@ function handleMessage(msg){
         createAccount(msg);
         createShoppingcart(msg);
     }
-    if(msg.fields.routingKey == "doei"){
-        handleDoeiMessage(msg);
+    if(msg.fields.routingKey.contains("product.create")){
+        createProduct(msg);
     }
 }
 
@@ -70,6 +71,22 @@ function createShoppingcart(msg){
   console.log(" [x] creating Shoppingcart: " + msg.content.toString());
 }
 
-function handleDoeiMessage(msg){
-  console.log(" [x] Recieved topic" + msg.fields.routingKey + ": %s", msg.content.toString());
+function createProduct(msg){
+  console.log(" [x] creating Product: " + msg.content.toString());
+  var product = JSON.parse(msg.content);
+
+  var new_product = new Product({
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    price: product.price
+  });
+
+  new_product.save(function(err, task) {
+    if (err){
+        res.send(err);
+    }
+    //TopicPublisher.sendMessageWithTopic(new_shoppingcart.toString(),"shoppingcart.create");
+    res.json(task);
+  });
 }
