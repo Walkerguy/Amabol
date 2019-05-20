@@ -6,13 +6,17 @@ var bodyParser = require('body-parser');
 var mongodb = require('./src/config/mongo.db');
 var environment = require('./src/config/environment');
 
-// All messaging equipment here.
-var MessageHandler = require("./src/messaging/MessageHandler");
-var MessagePublisher = require("./src/messaging/MessagePublisher");
-
-var TopicHandler = require("./src/messaging/TopicHandler");
-var TopicPublisher = require("./src/messaging/TopicPublisher");
+// All publishers.
+var MessagePublisher = require("./src/messaging/publishers/MessagePublisher");
+var OrderPublisher = require("./src/messaging/publishers/OrderPublisher");
+var TopicPublisher = require("./src/messaging/publishers/TopicPublisher");
 var Topics = ['#.inventory.#',"cool"] // Topics.
+
+// All receivers.
+var AllHandler = require("./src/messaging/receivers/_AllHandler");
+var AccountHandler = require("./src/messaging/receivers/AccountHandler");
+var ProductHandler = require("./src/messaging/receivers/ProductHandler");
+
 
 var OrderRoutes = require('./src/routes/OrderRoutes');
 
@@ -34,8 +38,8 @@ var server = app.listen(8888, function () {
   var port = server.address().port;
 
   // Add message listeners here.
-  MessageHandler.listen("logs");
-  TopicHandler.listen("topic_exchange",Topics);
+  //MessageHandler.listen("logs");
+  //TopicHandler.listen("topic_exchange",Topics);
 
   console.log('[SERVER] Listening at %s:%s.', host, port);
 

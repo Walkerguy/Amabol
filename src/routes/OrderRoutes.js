@@ -4,7 +4,7 @@ var routes = express.Router();
 var Account = require('../models/Account');
 var Order = require('../models/Order');
 var Product = require('../models/Product');
-var TopicPublisher = require('../messaging/TopicPublisher');
+var TopicPublisher = require('../messaging/publishers/TopicPublisher');
 
 routes.post('/', function(req, res, err) {
     const newOrder = req.body;
