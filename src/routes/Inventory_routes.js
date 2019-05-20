@@ -44,7 +44,7 @@ routes.post('/products', function(req, res) {
     res.json(req.body);
 });
 
-routes.update('/products/:id/changeAmount', function(req, res) {
+routes.put('/products/:id/changeAmount', function(req, res) {
     var id = req.params.id;
     var oldAmount;
     
