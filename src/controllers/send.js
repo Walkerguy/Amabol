@@ -1,7 +1,7 @@
 var amqp = require('amqplib/callback_api');
 
 exports.sendMessage = function(req,res){
-  amqp.connect('amqp://localhost', function(error0, connection) {
+  amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
     if (error0) {
       throw error0;
     }

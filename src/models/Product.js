@@ -13,6 +13,10 @@ const ProductSchema = new Schema({
     amount: {
         type: String,
         required: true
+    },
+    price:{
+        type: Number,
+        required: true
     }
 });
 

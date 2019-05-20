@@ -7,8 +7,6 @@ var TopicPublisher = require('../controllers/TopicPublisher');
 routes.get('/products', function (req, res) {
     res.contentType('application/json');
 
-    res.status(200).json(products);
-
     Product.find()
         .then(function (products) {
             res.status(200).json(products);
@@ -37,11 +35,11 @@ routes.post('/products', function(req, res) {
         if (err){
             res.send(err);
         }
-        res.json(task);
-    });
-    TopicPublisher.sendMessageWithTopic(new_product.toString(),"inventory.create");
+        TopicPublisher.sendMessageWithTopic(new_product.toString(),"inventory.create");
 
-    res.json(req.body);
+        res.json(req.body);
+    });
+    
 });
 
 routes.put('/products/:id/changeAmount', function(req, res) {
