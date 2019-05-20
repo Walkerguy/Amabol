@@ -10,7 +10,10 @@ routes.post('/', function(req, res, err) {
     const newOrder = req.body;
 
     // Important, create a unique id here.
-    //newOrder.id = require('uuid/v1');
+    const generatedId = require('uuid/v1'); 
+    newOrder.Id = generatedId();
+
+    console.log(newOrder.Id);
 
     Order.create(newOrder)
     .then(order => res.send(order))
