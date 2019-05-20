@@ -1,4 +1,6 @@
 var amqp = require('amqplib/callback_api');
+var Account = require('../models/Account');
+var uuidv1 = require('uuid/v1');
 
 exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
@@ -36,18 +38,38 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
 }
 
 function handleMessage(msg){
-    if(msg.fields.routingKey.contains("inventory")){
-        handleHelloMessage(msg);
+    if(msg.fields.routingKey.contains("account.create")){
+        createAccount(msg);
+        createShoppingcart(msg);
     }
     if(msg.fields.routingKey == "doei"){
         handleDoeiMessage(msg);
     }
 }
 
-function handleHelloMessage(msg){
-  console.log(" [x] Recieved topic" + msg.fields.routingKey + ": %s", msg.content.toString());
+function createAccount(msg){
+  console.log(" [x] creating Account: " + msg.content.toString());
+  var account = JSON.parse(msg.content);
+
+  var new_account = new Account({
+    id: account.id,
+    name: account.name,
+    address: account.address
+  });
+
+  new_account.save(function(err, task) {
+    if (err){
+        res.send(err);
+    }
+    //TopicPublisher.sendMessageWithTopic(new_shoppingcart.toString(),"shoppingcart.create");
+    res.json(task);
+  });
+}
+
+function createShoppingcart(msg){
+  console.log(" [x] creating Shoppingcart: " + msg.content.toString());
 }
 
 function handleDoeiMessage(msg){
-    console.log(" [x] Recieved topic" + msg.fields.routingKey + ": %s", msg.content.toString());
-  }
+  console.log(" [x] Recieved topic" + msg.fields.routingKey + ": %s", msg.content.toString());
+}
