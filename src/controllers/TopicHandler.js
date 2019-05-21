@@ -75,7 +75,7 @@ function createAccount(msg){
 }
 
 function updateAccount(msg){
-  var update = JSON.parse(msg);
+  var update = JSON.parse(msg.content.toString());
   var id = update.id;
 
   Account.update({ id: id }, update.newValue );
@@ -83,7 +83,7 @@ function updateAccount(msg){
 
 function createShoppingcart(msg){
   console.log(" [x] creating Shoppingcart: " + msg.content.toString());
-  var account = JSON.parse(msg);
+  var account = JSON.parse(msg.content.toString());
   var new_shoppingcart = new ShoppingCart({
     id: uuidv1(),
     account_id: account.id,
@@ -119,8 +119,7 @@ function createProduct(msg){
 }
 
 function updateProduct(msg){
-
-    var update = JSON.parse(msg);
+    var update = JSON.parse(msg.content.toString());
     var id = update.id;
 
     Product.update({ id: id }, update.newValue );

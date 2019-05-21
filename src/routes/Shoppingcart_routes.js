@@ -67,9 +67,6 @@ routes.put('/Shoppingcarts/:id/addProduct/:pid', function(req, res) {
         .catch((error) => {
             res.status(400).json(error);
         });
-    
-
-    
 });
 
 routes.put('/Shoppingcarts/:id/removeProduct/:pid', function(req, res) {

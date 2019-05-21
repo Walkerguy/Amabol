@@ -15,7 +15,8 @@ var TopicPublisher = require("./src/controllers/TopicPublisher");
 var Topics = ['product.#'] //topics to listen too
 
 
-var Shoppingcartroutes= require('./src/routes/Shoppingcart_routes');
+var Shoppingcartroutes = require('./src/routes/Shoppingcart_routes');
+var Inventoryroutes = require('./src/routes/Inventory_routes');
 
 app.use(bodyParser.urlencoded({
   'extended': 'true'
@@ -37,6 +38,7 @@ app.get('/publish', MessagePublisher.sendMessage);
 app.get('/publish/:text', MessagePublisher.sendMessage);
 
 app.use('', Shoppingcartroutes);
+app.use('', Inventoryroutes);
 
 var server = app.listen(8888, function () {
   var host = server.address().address;
