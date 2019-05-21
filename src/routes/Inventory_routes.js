@@ -53,7 +53,8 @@ routes.put('/products/:id', function(req, res) {
 
     Product.find({ 'id' : id })
         .then(function (product) {
-            var msg = { 'id': id, 'oldValue' : JSON.parse(product), 'newValue' : JSON.parse(req.body)}
+            console.log(product);
+            var msg = { 'id': id, 'oldValue' : product, 'newValue' : req.body}
             TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.updated");
             Product.updateOne({ id: id },{ $set : req.body }).then(function (newProduct){
                 res.status(200).json(newProduct);
