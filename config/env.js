@@ -1,6 +1,6 @@
 var env = {
   dbHost: '128.199.61.247',
-  dbPort: '27017',
+  dbPort: '27022',
   dbUser: '',
   dbPassword:'',
   dbDatabase: 'test'

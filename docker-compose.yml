@@ -1,29 +1,49 @@
 version: "3.1"
 services:
-    mongo:
-      image: mongo
-      restart: always
-      environment:
-        MONGO_INITDB_ROOT_USERNAME: root
-        MONGO_INITDB_ROOT_PASSWORD: example
-      ports:
-        - 27017:27017
-        - 28017:28017
 
-    mongo-express:
-      image: mongo-express
-      restart: always
-      ports:
-        - 8081:8081
-      environment:
-        ME_CONFIG_MONGODB_ADMINUSERNAME: root
-        ME_CONFIG_MONGODB_ADMINPASSWORD: example
+#Account
+    mongoAccount:
+          image: mongo
+          restart: always
+          ports:
+            - 27017:27017
+#Orders
+    mongoOrders:
+          image: mongo
+          restart: always
+          ports:
+            - 27016:27017
+#Shopping Cart
+    mongoShoppingCart:
+          image: mongo
+          restart: always
+          ports:
+            - 27018:27017
+#Helpdesk
+    mongoHelpDesk:
+          image: mongo
+          restart: always
+          ports:
+            - 27019:27017
+#Logistics
+    mongoLogistics:
+          image: mongo
+          restart: always
+          ports:
+            - 27020:27017
+#Inventory
+    mongoInventory:
+          image: mongo
+          restart: always
+          ports:
+            - 27021:27017
+#Logging
+    mongoLogging:
+          image: mongo
+          restart: always
+          ports:
+            - 27022:27017
 
-    node-web-app:
-      build:
-        context: .
-        dockerfile: Dockerfile-node
-
-      container_name: "node-web-app"
-      ports:
-        - "8888:8888"
+#Node Servers hieronder
+#    loggerService:
+#          image: node:11
