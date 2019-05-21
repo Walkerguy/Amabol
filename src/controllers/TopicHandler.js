@@ -108,6 +108,7 @@ function createProduct(msg){
     id: product.id,
     name: product.name,
     description: product.description,
+    amount: product.amount,
     price: product.price
   });
 
