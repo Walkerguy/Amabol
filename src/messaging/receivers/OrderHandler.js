@@ -2,6 +2,7 @@ var amqp = require('amqplib/callback_api');
 var Account = require('../../models/Account');
 var Product = require('../../models/Product');
 var Order = require('../../models/Order');
+var OrderPublisher = require('../publishers/OrderPublisher');
 
 exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
     if (error0) {
@@ -16,20 +17,21 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
           durable: true
         });
     
-        channel.assertQueue('shoppingcart_queue', {
+        channel.assertQueue('order_queue', {
         }, function(error2, q) {
           if (error2) {
             throw error2;
           }
-          console.log('[Shoppingcart Queue] Waiting for logs!');
+
+          console.log('[Order Queue] Waiting for logs!');
 
           for (i=0; i<topics.length; i++) {
             channel.bindQueue(q.queue, exchange, topics[i]);
           }
     
           channel.consume(q.queue, function(msg) {
+            console.log("[OrderHandler Received] %s:'%s'", msg.fields.routingKey, msg.content.toString());
             handleMessage(msg)
-            console.log("[Shoppingcart Received] %s:'%s'", msg.fields.routingKey, msg.content.toString());
           }, {
             noAck: true
           });
@@ -40,19 +42,39 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 
 function handleMessage(msg){
     if(msg.fields.routingKey.includes("shoppingcart.confirmed")){
-        createOrderByShoppingcart(msg);
+        createShoppingcart(msg);
+        createOrder(msg);
     }
 }
 
-// Here we convert a shoppingcart to an order.
-function createOrderByShoppingcart(msg){
-  console.log("[Shoppingcart Created Order] creating Shoppingcart: " + msg.content.toString());
-  var shoppingcart = JSON.parse(msg.content.toString());
+// Make a shoppingcart.
+function createShoppingcart(msg){
+  console.log("[Shoppingcart Created] creating shoppingcart: " + msg.content.toString());
+  var newShoppingcart = new Shoppingcart(JSON.parse(msg.content.toString()));
+
+  newShoppingcart.save(function(err, task) {
+    if (err){
+      console.log(err);
+    }
+  });
+  
+
+  newOrder.save(function(err, task) {
+    if (err){
+      console.log(err);
+    }
+  });
+}
+
+// Make a new order based on the shoppingcart.
+function createOrder(msg){
+  console.log("[Order Created] creating order: " + msg.content.toString());
+  var newShoppingcart = new Shoppingcart(JSON.parse(msg.content.toString()));
 
   var newOrder = new Order;
-  newOrder.buyer = shoppingcart.account_id;
-  newOrder.shoppingcart = shoppingcart.products;
-  newOrder.totalPrice = shoppingcart.totalPRice;
+  newOrder.buyer = newShoppingcart.account_id;
+  newOrder.shoppingcart = newShoppingcart.products;
+  newOrder.totalPrice = newShoppingcart.totalPRice;
   
 
   newOrder.save(function(err, task) {

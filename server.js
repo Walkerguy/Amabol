@@ -14,7 +14,7 @@ var Topics = ['#.inventory.#',"cool"] // Topics.
 
 // All receivers.
 var AllHandler = require("./src/messaging/receivers/_AllHandler");
-var ShoppingcartHandler = require("./src/messaging/receivers/ShoppingcartHandler");
+var ShoppingcartHandler = require("./src/messaging/receivers/OrderHandler");
 var ProductHandler = require("./src/messaging/receivers/ProductHandler");
 
 
@@ -38,11 +38,8 @@ var server = app.listen(8888, function () {
   var port = server.address().port;
 
   // Add message listeners here.
-  //MessageHandler.listen("logs");
-  //TopicHandler.listen("topic_exchange",Topics);
+  // MessageHandler.listen("logs");
+  // TopicHandler.listen("topic_exchange",Topics);
 
   console.log('[SERVER] Listening at %s:%s.', host, port);
-
-  const uuidv1 = require('uuid/v1'); 
-  console.log("[UUID] " + uuidv1());
 });
