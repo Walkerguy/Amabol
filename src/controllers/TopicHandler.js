@@ -1,4 +1,6 @@
 var amqp = require('amqplib/callback_api');
+var Product = require('../models/Product');
+var TopicPublisher = require('../controllers/TopicPublisher');
 
 exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
     if (error0) {
@@ -37,18 +39,28 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 }
 
 function handleMessage(msg){
-    if(msg.fields.routingKey.includes("inventory")){
-        handleHelloMessage(msg);
-    }
-    if(msg.fields.routingKey == "doei"){
-        handleDoeiMessage(msg);
+    if(msg.fields.routingKey.includes("order.confirmed")){
+        updateProducts(msg);
     }
 }
 
-function handleHelloMessage(msg){
+function updateProducts(msg){
   console.log(" [x] Recieved topic" + msg.fields.routingKey + ": %s", msg.content.toString());
-}
+  var order = JSON.parse(msg);
+  order.productIds.array.forEach(productId => {
+    Product.find({"id": productId}).then(function (product){
 
-function handleDoeiMessage(msg){
-    console.log(" [x] Recieved topic" + msg.fields.routingKey + ": %s", msg.content.toString());
-  }
+      oldAmount = product.amount;
+      var msg = { 'id': productId, 'oldValue' : JSON.stringify(product), 'newValue' : {"amount" : oldAmount -1}}
+      TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.updated");
+    })
+    .catch((error) => {
+        res.status(400).json(error);
+    });
+
+    Product.findOneAndUpdate({
+      query: { id: productId },
+      update: { $inc: { amount: -1 } }
+    });
+  });
+}

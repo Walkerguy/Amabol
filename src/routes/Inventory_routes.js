@@ -44,22 +44,20 @@ routes.post('/products', function(req, res) {
         }
     });
 
-    TopicPublisher.sendMessageWithTopic(new_product.toString(),"product.created");
+    TopicPublisher.sendMessageWithTopic(JSON.stringify(new_product),"product.created");
         
     res.json(req.body);
     
 });
 
-routes.put('/products/:id/changeAmount', function(req, res) {
+routes.put('/products/:id', function(req, res) {
     var id = req.params.id;
-    var oldAmount;
-    
-    Product.find({ 'id' : req.params.id })
+
+    Product.find({ 'id' : id })
         .then(function (product) {
             res.status(200).json(product);
-            oldAmount = product.amount;
-            var msg = { 'id': product.id, 'oldAmount' : oldAmount, 'newAmount' : req.body.amount}
-            TopicPublisher.sendMessageWithTopic(msg,"product.updated");
+            var msg = { 'id': product.id, 'oldValue' : product.toString(), 'newValue' : req.body}
+            TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.updated");
             res.json(req.body);
             console.log(product);
         })
@@ -67,11 +65,7 @@ routes.put('/products/:id/changeAmount', function(req, res) {
             res.status(400).json(error);
         });
 
-    Product.findOneAndUpdate({
-        query: { _id: ObjectId(id) },
-        update: { $set: { amount: req.body.amount } }
-    });
-
+    Product.update({ id: id }, req.body );
    
 });
 
@@ -85,7 +79,7 @@ routes.delete('/products/:id', function (req, res) {
             res.status(400).json(error);
         });
 
-    TopicPublisher.sendMessageWithTopic(new_product.toString(),"product.deleted");
+    TopicPublisher.sendMessageWithTopic(req.params.id,"product.deleted");
 
 });
 
