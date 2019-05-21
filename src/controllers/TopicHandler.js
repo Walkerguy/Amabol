@@ -69,7 +69,6 @@ function createAccount(msg){
     if (err){
         res.send(err);
     }
-    //TopicPublisher.sendMessageWithTopic(new_shoppingcart.toString(),"shoppingcart.create");
     res.json(task);
   });
 }
@@ -78,7 +77,7 @@ function updateAccount(msg){
   var update = JSON.parse(msg.content.toString());
   var id = update.id;
 
-  Account.update({ id: id }, { $set : update.newValue} );
+  Account.updateOne({ id: id }, { $set : update.newValue} );
 }
 
 function createShoppingcart(msg){
@@ -123,5 +122,5 @@ function updateProduct(msg){
     var update = JSON.parse(msg.content.toString());
     var id = update.id;
 
-    Product.update({ id: id }, {$set : update.newValue } );
+    Product.updateOne({ id: id },{ $set : update.newValue } );
 }
