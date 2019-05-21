@@ -124,16 +124,17 @@ function createProduct(msg){
 function updateProduct(msg){
     var update = JSON.parse(msg.content.toString());
     var id = update.id;
+    console.log(id);
 
-    Product.updateOne(
-      {id: id}, 
-      { $set :
-        {amount: update.newValue.amount,
+    Product.updateOne({ id: id },{ $set : 
+      {
+        amount : update.newValue.amount,
         name: update.newValue.name,
-        description: update.newValue.description,
-        price: update.newValue.price}
-      }
-    )
-    .then(product => console.log(product))
-    .catch((error) => console.log(error));
+        description : update.newValue.description,
+        price: update.newValue.price
+      } }).then(function (newProduct){
+        console.log(newProduct);
+    }).catch((error) => {
+        console.log(error);
+    });
 }
