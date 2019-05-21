@@ -12,7 +12,7 @@ var MessagePublisher = require("./src/controllers/MessagePublisher");
 //topic based messaging
 var TopicHandler = require("./src/controllers/TopicHandler");
 var TopicPublisher = require("./src/controllers/TopicPublisher");
-var Topics = ['inventory.#',"cool"] //topics to listen too
+var Topics = ['order.#'] //topics to listen too
 
 
 var inventoryroutes= require('./src/routes/Inventory_routes');
@@ -46,7 +46,7 @@ var server = app.listen(8888, function () {
 
   //receiveController.listen("hello");
   //MessageHandler.listen("logs");
-  //TopicHandler.listen("topic_exchange",Topics);
+  TopicHandler.listen("topic_exchange",Topics);
 
   console.log('Example app listening at http://%s:%s', host, port);
 });
