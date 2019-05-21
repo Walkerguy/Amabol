@@ -22,7 +22,11 @@ const OrderSchema = new Schema({
     // Products array.
     productIds: [{
         type: String
-    }]
+    }],
+
+    totalPrice: {
+        type: Number
+    }
 
 }, { collection: 'Order' });
 

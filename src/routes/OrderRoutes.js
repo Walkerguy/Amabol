@@ -1,10 +1,9 @@
 var express = require('express');
 var routes = express.Router();
-//var mongodb = require('../config/mongo.db');
 var Account = require('../models/Account');
 var Order = require('../models/Order');
 var Product = require('../models/Product');
-var TopicPublisher = require('../messaging/publishers/TopicPublisher');
+var OrderPublisher = require('../messaging/publishers/OrderPublisher');
 
 routes.post('/', function(req, res, err) {
     const newOrder = req.body;
@@ -16,10 +15,10 @@ routes.post('/', function(req, res, err) {
     console.log(newOrder.id);
 
     Order.create(newOrder)
-    .then(order => res.send(order)).then(console.log("Put a created event here."))
-    .catch((err) => {
-        console.log(err);
-    });
+        .then(order => res.send(order)).then(console.log("Put a created event here."))
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 routes.get('/', function (req, res, next) {
@@ -39,8 +38,8 @@ routes.put('/:id', function (req, res, next) {
     const updatedOrder = req.body;
 
     Order.findOneAndUpdate({id: orderId}, updatedOrder)
-    .then(order => res.send(order))
-    .catch(next);
+        .then(order => res.send(order))
+        .catch(next);
 });
 
 routes.delete('/:id', function (req, res, next) {
@@ -49,10 +48,17 @@ routes.delete('/:id', function (req, res, next) {
         .catch(next);
 });
 
-routes.get('/deleteall', function (req, res, next) {
+routes.delete('/deleteall', function (req, res, next) {
     Order.deleteMany({})
-    .then((order) => res.status(200).send(order))
-    .catch(next);
+        .then((order) => res.status(200).send(order))
+        .catch(next);
+});
+
+// Order finalized.
+routes.post('/confirmed', function (req, res, next) {
+    Order.updateOne({id: req.body.id}, { status: "Confirmed."})
+        .then(order => res.send(order)).then(console.log("Put a CONFIRMED event here."))
+        .catch(next);
 });
 
 module.exports = routes;

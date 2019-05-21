@@ -14,7 +14,7 @@ var Topics = ['#.inventory.#',"cool"] // Topics.
 
 // All receivers.
 var AllHandler = require("./src/messaging/receivers/_AllHandler");
-var AccountHandler = require("./src/messaging/receivers/AccountHandler");
+var ShoppingcartHandler = require("./src/messaging/receivers/ShoppingcartHandler");
 var ProductHandler = require("./src/messaging/receivers/ProductHandler");
 
 
