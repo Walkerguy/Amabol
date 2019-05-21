@@ -78,7 +78,7 @@ function updateAccount(msg){
   var update = JSON.parse(msg.content.toString());
   var id = update.id;
 
-  Account.update({ id: id }, update.newValue );
+  Account.update({ id: id }, { $set : update.newValue} );
 }
 
 function createShoppingcart(msg){
@@ -123,5 +123,5 @@ function updateProduct(msg){
     var update = JSON.parse(msg.content.toString());
     var id = update.id;
 
-    Product.update({ id: id }, update.newValue );
+    Product.update({ id: id }, {$set : update.newValue } );
 }
