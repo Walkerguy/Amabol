@@ -38,7 +38,8 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 
         const event = {
           event: msg.content.toString(),
-          date: dateTime
+          date: dateTime,
+          topic: msg.fields.routingKey
         }
         Event.create(event)
           .then(e => {
