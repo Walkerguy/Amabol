@@ -60,7 +60,7 @@ routes.put('/Shoppingcarts/:id/addProduct/:pid', function(req, res) {
                 query: { _id: id },
                 update: { $inc: { totalPrice: product.price } }
             });
-            TopicPublisher.sendMessageWithTopic({"id": id, "": ""},"shoppingcart.added");
+            TopicPublisher.sendMessageWithTopic(JSON.stringify({"id": id, "product_id":pid}),"shoppingcart.added");
 
             res.json(req.body);
         })
@@ -86,7 +86,7 @@ routes.put('/Shoppingcarts/:id/removeProduct/:pid', function(req, res) {
                 query: { _id: id },
                 update: { $inc: { totalPrice: -product.price } }
             });
-            TopicPublisher.sendMessageWithTopic(new_product.toString(),"shoppingcart.removed");
+            TopicPublisher.sendMessageWithTopic(JSON.stringify({"id": id, "product_id":pid}),"shoppingcart.removed");
 
             res.json(req.body);
         })

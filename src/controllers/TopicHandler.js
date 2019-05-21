@@ -1,6 +1,7 @@
 var amqp = require('amqplib/callback_api');
 var Account = require('../models/Account');
 var Product = require('../models/Product');
+var ShoppingCart = require('../models/ShoppingCart');
 var uuidv1 = require('uuid/v1');
 
 exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
@@ -40,11 +41,17 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 
 function handleMessage(msg){
     if(msg.fields.routingKey.includes("account.create")){
-        createAccount(msg);
-        createShoppingcart(msg);
+      createAccount(msg);
+      createShoppingcart(msg);
+    }
+    if(msg.fields.routingKey.includes("account.updated")){
+      updateAccount(msg);
     }
     if(msg.fields.routingKey.includes("product.created")){
-        createProduct(msg);
+      createProduct(msg);
+    }
+    if(msg.fields.routingKey.includes("product.updated")){
+      updateProduct(msg);
     }
 }
 
@@ -67,8 +74,30 @@ function createAccount(msg){
   });
 }
 
+function updateAccount(msg){
+  var update = JSON.parse(msg);
+  var id = update.id;
+
+  Account.update({ id: id }, update.newValue );
+}
+
 function createShoppingcart(msg){
   console.log(" [x] creating Shoppingcart: " + msg.content.toString());
+  var account = JSON.parse(msg);
+  var new_shoppingcart = new ShoppingCart({
+    id: uuidv1(),
+    account_id: account.id,
+    Products: [],
+    totalPrice: 0 
+  });
+
+  new_shoppingcart.save(function(err, task) {
+      if (err){
+          res.send(err);
+      }
+      TopicPublisher.sendMessageWithTopic(JSON.stringify(new_shoppingcart),"shoppingcart.created");
+      res.json(task);
+  });
 }
 
 function createProduct(msg){
@@ -87,4 +116,12 @@ function createProduct(msg){
       console.log(err);
     }
   });
+}
+
+function updateProduct(msg){
+
+    var update = JSON.parse(msg);
+    var id = update.id;
+
+    Product.update({ id: id }, update.newValue );
 }
