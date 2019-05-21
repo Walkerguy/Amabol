@@ -43,7 +43,7 @@ function handleMessage(msg){
         createAccount(msg);
         createShoppingcart(msg);
     }
-    if(msg.fields.routingKey.contains("product.create")){
+    if(msg.fields.routingKey.contains("product.created")){
         createProduct(msg);
     }
 }
@@ -84,9 +84,7 @@ function createProduct(msg){
 
   new_product.save(function(err, task) {
     if (err){
-        res.send(err);
+      console.log(err);
     }
-    //TopicPublisher.sendMessageWithTopic(new_shoppingcart.toString(),"shoppingcart.create");
-    res.json(task);
   });
 }

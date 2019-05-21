@@ -12,7 +12,7 @@ var MessagePublisher = require("./src/controllers/MessagePublisher");
 //topic based messaging
 var TopicHandler = require("./src/controllers/TopicHandler");
 var TopicPublisher = require("./src/controllers/TopicPublisher");
-var Topics = ['#.account.#'] //topics to listen too
+var Topics = ['product.#'] //topics to listen too
 
 
 var Shoppingcartroutes= require('./src/routes/Shoppingcart_routes');

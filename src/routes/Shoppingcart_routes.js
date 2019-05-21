@@ -41,7 +41,7 @@ routes.post('/Shoppingcarts', function(req, res) {
         if (err){
             res.send(err);
         }
-        TopicPublisher.sendMessageWithTopic(new_shoppingcart.toString(),"shoppingcart.create");
+        TopicPublisher.sendMessageWithTopic(new_shoppingcart.toString(),"shoppingcart.created");
         res.json(task);
     });
 });
@@ -60,7 +60,7 @@ routes.put('/Shoppingcarts/:id/addProduct/:pid', function(req, res) {
                 query: { _id: id },
                 update: { $inc: { totalPrice: product.price } }
             });
-            TopicPublisher.sendMessageWithTopic({"id": id, "": ""},"shoppingcart.add");
+            TopicPublisher.sendMessageWithTopic({"id": id, "": ""},"shoppingcart.added");
 
             res.json(req.body);
         })
@@ -86,7 +86,7 @@ routes.put('/Shoppingcarts/:id/removeProduct/:pid', function(req, res) {
                 query: { _id: id },
                 update: { $inc: { totalPrice: -product.price } }
             });
-            TopicPublisher.sendMessageWithTopic(new_product.toString(),"shoppingcart.remove");
+            TopicPublisher.sendMessageWithTopic(new_product.toString(),"shoppingcart.removed");
 
             res.json(req.body);
         })
@@ -108,7 +108,7 @@ routes.delete('/Shoppingcarts/:id', function (req, res) {
             res.status(400).json(error);
         });
 
-    TopicPublisher.sendMessageWithTopic(new_product.toString(),"shoppingcart.delete");
+    TopicPublisher.sendMessageWithTopic(new_product.toString(),"shoppingcart.deleted");
 
 });
 
