@@ -14,7 +14,7 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
           durable: true
         });
     
-        channel.assertQueue('order_queue', {
+        channel.assertQueue('order', {
         }, function(error2, q) {
           if (error2) {
             throw error2;

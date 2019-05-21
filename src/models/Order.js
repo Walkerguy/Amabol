@@ -2,10 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const OrderSchema = new Schema({
-    Id: {
+    id: {
         type: String,
-        //required: true
+        required: true
     },
+
     // Who made the order.
     buyer:{
         type: Schema.Types.ObjectId,
@@ -19,9 +20,8 @@ const OrderSchema = new Schema({
     },
 
     // Products array.
-    shoppingcart: [{
-        type: Schema.Types.ObjectId,
-        ref: "Product"
+    productIds: [{
+        type: String
     }]
 
 }, { collection: 'Order' });
