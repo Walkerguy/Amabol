@@ -7,7 +7,6 @@ var uuidv1 = require('uuid/v1');
 
 routes.get('/products', function (req, res) {
     res.contentType('application/json');
-    console.log("request sent");
     Product.find()
         .then(function (products) {
             res.status(200).json(products);
@@ -22,7 +21,6 @@ routes.get('/products/:id', function (req, res) {
     Product.find({ 'id' : req.params.id})
         .then(function (product) {
             res.status(200).json(product);
-            console.log(product);
         })
         .catch((error) => {
             res.status(400).json(error);
@@ -55,17 +53,19 @@ routes.put('/products/:id', function(req, res) {
 
     Product.find({ 'id' : id })
         .then(function (product) {
-            res.status(200).json(product);
             var msg = { 'id': product.id, 'oldValue' : product.toString(), 'newValue' : req.body}
             TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.updated");
-            res.json(req.body);
-            console.log(product);
+            Product.updateOne({ id: id },{ $set : req.body }).then(function (newProduct){
+                res.status(200).json(newProduct);
+            }).catch((error) => {
+                console.log(error);
+            });
         })
         .catch((error) => {
-            res.status(400).json(error);
+            console.log(error);
         });
 
-    Product.update({ id: id }, req.body );
+    
    
 });
 
