@@ -44,7 +44,7 @@ routes.post('/products', function(req, res) {
         }
     });
 
-    TopicPublisher.sendMessageWithTopic(new_product.toString(),"inventory.create");
+    TopicPublisher.sendMessageWithTopic(new_product.toString(),"product.created");
         
     res.json(req.body);
     
@@ -54,12 +54,12 @@ routes.put('/products/:id/changeAmount', function(req, res) {
     var id = req.params.id;
     var oldAmount;
     
-    Product.find({ '_id' : ObjectId(req.params.id)})
+    Product.find({ 'id' : req.params.id })
         .then(function (product) {
             res.status(200).json(product);
             oldAmount = product.amount;
             var msg = { 'id': product.id, 'oldAmount' : oldAmount, 'newAmount' : req.body.amount}
-            TopicPublisher.sendMessageWithTopic(msg,"inventory.update");
+            TopicPublisher.sendMessageWithTopic(msg,"product.updated");
             res.json(req.body);
             console.log(product);
         })
@@ -76,16 +76,16 @@ routes.put('/products/:id/changeAmount', function(req, res) {
 });
 
 routes.delete('/products/:id', function (req, res) {
-    // Product.findOneAndDelete({ '_id' : ObjectId(req.params.id)})
-    //     .then(function (res) {
-    //         res.status(200).json({"msg": 'product deleted'});
-    //         console.log(res);
-    //     })
-    //     .catch((error) => {
-    //         res.status(400).json(error);
-    //     });
+    Product.findOneAndDelete({ 'id' : req.params.id})
+        .then(function (res) {
+            res.status(200).json({"msg": 'product deleted'});
+            console.log(res);
+        })
+        .catch((error) => {
+            res.status(400).json(error);
+        });
 
-    TopicPublisher.sendMessageWithTopic(new_product.toString(),"inventory.delete");
+    TopicPublisher.sendMessageWithTopic(new_product.toString(),"product.deleted");
 
 });
 

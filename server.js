@@ -46,7 +46,7 @@ var server = app.listen(8888, function () {
 
   //receiveController.listen("hello");
   //MessageHandler.listen("logs");
-  TopicHandler.listen("topic_exchange",Topics);
+  //TopicHandler.listen("topic_exchange",Topics);
 
   console.log('Example app listening at http://%s:%s', host, port);
 });
