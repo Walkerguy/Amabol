@@ -77,7 +77,10 @@ function updateAccount(msg){
   var update = JSON.parse(msg.content.toString());
   var id = update.id;
 
-  Account.updateOne({ id: id }, { $set : update.newValue} );
+  Account.updateOne({ id: id }, { 
+    name : update.newValue.name,
+    address : update.newValue.address
+  } );
 }
 
 function createShoppingcart(msg){
@@ -122,5 +125,16 @@ function updateProduct(msg){
     var update = JSON.parse(msg.content.toString());
     var id = update.id;
 
-    Product.updateOne({ id: id },{ $set : update.newValue } );
+    Product.findOneAndUpdate({ 
+      query : {id: id}, 
+      update : { $set : {
+        amount: update.newValue.amount,
+        name: update.newValue.name,
+        description: update.newValue.description,
+        price: update.newValue.price
+        }
+      }
+    })
+    .then(product => console.log(product))
+    .catch((error) => console.log(error));
 }

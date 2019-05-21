@@ -33,7 +33,7 @@ routes.post('/Shoppingcarts', function(req, res) {
     var new_shoppingcart = new ShoppingCart({
         id: uuidv1(),
         account_id: req.body.account_id,
-        Products: [],
+        products: [],
         totalPrice: 0 
     });
 
@@ -41,7 +41,7 @@ routes.post('/Shoppingcarts', function(req, res) {
         if (err){
             res.send(err);
         }
-        TopicPublisher.sendMessageWithTopic(new_shoppingcart.toString(),"shoppingcart.created");
+        TopicPublisher.sendMessageWithTopic(JSON.stringify(new_shoppingcart),"shoppingcart.created");
         res.json(task);
     });
 });
@@ -53,11 +53,11 @@ routes.put('/Shoppingcarts/:id/addProduct/:pid', function(req, res) {
     Product.find({ 'id' : pid})
         .then(function (product) {
             ShoppingCart.findOneAndUpdate({
-                query: { _id: id },
+                query: { id: id },
                 update: { $push: { products: product.id } }
             });
             ShoppingCart.findOneAndUpdate({
-                query: { _id: id },
+                query: { id: id },
                 update: { $inc: { totalPrice: product.price } }
             });
             TopicPublisher.sendMessageWithTopic(JSON.stringify({"id": id, "product_id":pid}),"shoppingcart.added");
@@ -76,11 +76,11 @@ routes.put('/Shoppingcarts/:id/removeProduct/:pid', function(req, res) {
     Product.find({ 'id' : pid})
         .then(function (product) {
             ShoppingCart.findOneAndUpdate({
-                query: { _id: id },
+                query: { id: id },
                 update: { $pull: { products: product.id } }
             });
             ShoppingCart.findOneAndUpdate({
-                query: { _id: id },
+                query: { id: id },
                 update: { $inc: { totalPrice: -product.price } }
             });
             TopicPublisher.sendMessageWithTopic(JSON.stringify({"id": id, "product_id":pid}),"shoppingcart.removed");
