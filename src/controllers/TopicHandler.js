@@ -3,7 +3,7 @@ var Account = require('../models/Account');
 var Product = require('../models/Product');
 var uuidv1 = require('uuid/v1');
 
-exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', function(error0, connection) {
+exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
     if (error0) {
         throw error0;
       }
@@ -39,18 +39,18 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://localhost', fun
 }
 
 function handleMessage(msg){
-    if(msg.fields.routingKey.contains("account.create")){
+    if(msg.fields.routingKey.includes("account.create")){
         createAccount(msg);
         createShoppingcart(msg);
     }
-    if(msg.fields.routingKey.contains("product.created")){
+    if(msg.fields.routingKey.includes("product.created")){
         createProduct(msg);
     }
 }
 
 function createAccount(msg){
   console.log(" [x] creating Account: " + msg.content.toString());
-  var account = JSON.parse(msg.content);
+  var account = JSON.parse(msg.content.toString());
 
   var new_account = new Account({
     id: account.id,
@@ -73,7 +73,7 @@ function createShoppingcart(msg){
 
 function createProduct(msg){
   console.log(" [x] creating Product: " + msg.content.toString());
-  var product = JSON.parse(msg.content);
+  var product = JSON.parse(msg.content.toString());
 
   var new_product = new Product({
     id: product.id,

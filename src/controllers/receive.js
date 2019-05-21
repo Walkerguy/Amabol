@@ -1,6 +1,6 @@
 var amqp = require('amqplib/callback_api');
 
-exports.listen = function(queue) {amqp.connect('amqp://localhost', function(error0, connection) {
+exports.listen = function(queue) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
     if (error0) {
       throw error0;
     }
