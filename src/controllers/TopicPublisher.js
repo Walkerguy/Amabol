@@ -9,13 +9,10 @@ module.exports.sendMessageWithTopic =  function(msg,key) {
         if (error1) {
           throw error1;
         }
-        var exchange = 'topic_logs';
-        var args = process.argv.slice(2);
-        //var key = req.params.topic || 'anonymous.info';
-        //var msg = req.params.text || 'Hello World!';
+        var exchange = 'topic_exchange';
     
         channel.assertExchange(exchange, 'topic', {
-          durable: false
+          durable: true
         });
         channel.publish(exchange, key, Buffer.from(msg));
         console.log(" [x] Sent %s:'%s'", key, msg);

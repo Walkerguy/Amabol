@@ -11,11 +11,10 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
         //var exchange = 'topic_logs';
     
         channel.assertExchange(exchange, 'topic', {
-          durable: false
+          durable: true
         });
     
-        channel.assertQueue('', {
-          exclusive: true
+        channel.assertQueue('inventory_queue', {
         }, function(error2, q) {
           if (error2) {
             throw error2;
@@ -38,7 +37,7 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 }
 
 function handleMessage(msg){
-    if(msg.fields.routingKey.contains("inventory")){
+    if(msg.fields.routingKey.includes("inventory")){
         handleHelloMessage(msg);
     }
     if(msg.fields.routingKey == "doei"){

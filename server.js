@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var mongodb = require('./src/config/mongo.db');
 
 //basic sending en recieving 
 var sendController = require("./src/controllers/send");
@@ -11,7 +12,7 @@ var MessagePublisher = require("./src/controllers/MessagePublisher");
 //topic based messaging
 var TopicHandler = require("./src/controllers/TopicHandler");
 var TopicPublisher = require("./src/controllers/TopicPublisher");
-var Topics = ['#.inventory.#',"cool"] //topics to listen too
+var Topics = ['inventory.#',"cool"] //topics to listen too
 
 
 var inventoryroutes= require('./src/routes/Inventory_routes');
@@ -43,9 +44,9 @@ var server = app.listen(8888, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  receiveController.listen("hello");
-  MessageHandler.listen("logs");
-  TopicHandler.listen("topic_logs",Topics);
+  //receiveController.listen("hello");
+  //MessageHandler.listen("logs");
+  TopicHandler.listen("topic_exchange",Topics);
 
   console.log('Example app listening at http://%s:%s', host, port);
 });

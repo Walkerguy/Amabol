@@ -1,12 +1,13 @@
 var express = require('express');
 var routes = express.Router();
-//var mongodb = require('../config/mongo.db');
+var mongodb = require('../config/mongo.db');
 var Product = require('../models/Product');
 var TopicPublisher = require('../controllers/TopicPublisher');
+var uuidv1 = require('uuid/v1');
 
 routes.get('/products', function (req, res) {
     res.contentType('application/json');
-
+    console.log("request sent");
     Product.find()
         .then(function (products) {
             res.status(200).json(products);
@@ -18,7 +19,7 @@ routes.get('/products', function (req, res) {
 });
 
 routes.get('/products/:id', function (req, res) {
-    Product.find({ '_id' : ObjectId(req.params.id)})
+    Product.find({ 'id' : req.params.id})
         .then(function (product) {
             res.status(200).json(product);
             console.log(product);
@@ -29,16 +30,23 @@ routes.get('/products/:id', function (req, res) {
 });
 
 routes.post('/products', function(req, res) {
-    var new_product = new Product(req.body);
+    var new_product = new Product({
+        id: uuidv1(),
+        name: req.body.name,
+        description: req.body.description,
+        amount: req.body.amount,
+        price: req.body.price
+    });
 
     new_product.save(function(err, task) {
         if (err){
             res.send(err);
         }
-        TopicPublisher.sendMessageWithTopic(new_product.toString(),"inventory.create");
-
-        res.json(req.body);
     });
+
+    TopicPublisher.sendMessageWithTopic(new_product.toString(),"inventory.create");
+        
+    res.json(req.body);
     
 });
 
