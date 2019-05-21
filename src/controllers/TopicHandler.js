@@ -124,7 +124,6 @@ function createProduct(msg){
 function updateProduct(msg){
     var update = JSON.parse(msg.content.toString());
     var id = update.id;
-    console.log(id);
 
     Product.updateOne({ id: id },{ $set : 
       {
