@@ -4,7 +4,7 @@ var app = express();
 var events = require('./routes/event.route');
 
 var receiveController = require('./src/controllers/AllMessagesHandler');
-var Topics = ['product.#','shoppingcart.#']
+var Topics = ['product.#','shoppingcart.#','account.#','logistics.#','helpdesk.#','order.#','inventory.#']
 
 //basic sending en recieving
 // var sendController = require("./src/controllers/send");
