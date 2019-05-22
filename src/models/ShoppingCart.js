@@ -12,7 +12,7 @@ const ShoppingcartSchema = new Schema({
         required: true
     },
     Products: {
-        type: [],
+        type: [{type: String}],
         required: true
     },
     totalPrice: {
