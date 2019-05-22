@@ -3,7 +3,7 @@ var env = {
   dbPort: '27020',
   dbUser: '',
   dbPassword:'',
-  dbDatabase: 'test'
+  dbDatabase: 'logistics'
 }
 
 var dburl = 'mongodb://' + env.dbHost + ':' + env.dbPort + '/' + env.dbDatabase;

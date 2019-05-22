@@ -43,12 +43,23 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 }
 
 function handleMessage(msg){
-  if(msg.fields.routingKey.includes('shipping.delivered')){
-    shippingUpdate(msg);
+  if(msg.fields.routingKey.includes('order.confirmed')){
+    newShipping(msg);
   }
 }
 
-function shipping(msg){
+function newShipping(msg){
   console.log('received topics: ' + msg.fields.routingKey + ' and '+msg.content.toString());
-
+  var shipping = JSON.parse(msg.content.toString());
+  var new_shipping = new Shipping({
+    id: shipping.id,
+    deliveryAddress: shipping.buyer.address,
+    status: "OrderConfirmed",
+    products: shipping.productsIds
+  })
+  new_shipping.save(function (error) {
+    if(error){
+      console.log(error);
+    }
+  })
 }
