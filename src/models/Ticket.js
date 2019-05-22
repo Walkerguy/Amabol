@@ -17,6 +17,9 @@ const TicketSchema = new Schema({
     description: {
         type: String,
         required: true
+    },
+    order: {
+        type: String
     }
 });
 

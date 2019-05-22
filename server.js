@@ -31,8 +31,7 @@ var server = app.listen(8888, function () {
   var port = server.address().port;
 
   // Add message listeners here.
-  //MessageHandler.listen("logs");
-  //TopicHandler.listen("topic_exchange",Topics);
+  TopicHandler.listen("topic_exchange",Topics);
 
   console.log('[SERVER] Listening at %s:%s.', host, port);
 

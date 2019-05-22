@@ -1,6 +1,6 @@
 var amqp = require('amqplib/callback_api');
-var Account = require('../models/Account');
-var Product = require('../models/Product');
+var Product = require('../../models/Product');
+var Account = require('../../models/Account')
 var uuidv1 = require('uuid/v1');
 
 
