@@ -1,6 +1,6 @@
 var amqp = require('amqplib/callback_api');
 var mongodb = require('./../../config/mongo.db');
-var Event = require('./../../model/event.model');
+var Shipping = require('./../../model/shipping.model')
 
 exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
   if (error0) {
@@ -31,21 +31,8 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 
       channel.consume(q.queue, function(msg) {
 
-        var today = new Date();
-        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        var dateTime = date+' '+time;
-
-        const event = {
-          event: msg.content.toString(),
-          date: dateTime
-        }
-        Event.create(event)
-          .then(e => {
-            console.log(e);
-          })
-
-        console.log(" [x] %s:'%s'", msg.fields.routingKey, msg.content.toString());
+       handleMessage(msg)
+       console.log(" [x] %s:'%s'", msg.fields.routingKey, msg.content.toString());
       }, {
         noAck: true
       });
@@ -55,3 +42,13 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 });
 }
 
+function handleMessage(msg){
+  if(msg.fields.routingKey.includes('shipping.delivered')){
+    shippingUpdate(msg);
+  }
+}
+
+function shipping(msg){
+  console.log('received topics: ' + msg.fields.routingKey + ' and '+msg.content.toString());
+
+}

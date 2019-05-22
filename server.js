@@ -24,18 +24,23 @@ var TopicHandler = require("./src/controllers/TopicHandler");
 var TopicPublisher = require("./src/controllers/TopicPublisher");
 var Topics = ['hello'] //topics to listen too
 
-app.get('/', function (req, res) {
-  res.send('<h1>Hello World from Nodejs!</h1>');
-});
+var logistics = require('./routes/shippings')
 
-app.get('/send', sendController.sendMessage);
-app.get('/send/:text', sendController.sendMessage);
+const generatedId = require('uuid/v1');
 
-app.get('/publish', MessagePublisher.sendMessage);
-app.get('/publish/:text', MessagePublisher.sendMessage);
+// app.get('/', function (req, res) {
+//   res.send('<h1>Hello World from Nodejs!</h1>');
+// });
 
-app.get('/topic/:text/:topic', TopicPublisher.sendMessageWithTopic);
+// app.get('/send', sendController.sendMessage);
+// app.get('/send/:text', sendController.sendMessage);
+//
+// app.get('/publish', MessagePublisher.sendMessage);
+// app.get('/publish/:text', MessagePublisher.sendMessage);
+//
+// app.get('/topic/:text/:topic', TopicPublisher.sendMessageWithTopic);
 
+app.use('/logistics', logistics);
 
 var server = app.listen(8888, function () {
   var host = server.address().address;
@@ -43,7 +48,8 @@ var server = app.listen(8888, function () {
 
   // receiveController.listen("hello");
   // MessageHandler.listen("logs");
-  TopicHandler.listen("topic_logs",Topics)
+  //TopicHandler.listen("topic_logs",Topics)
 
+  console.log('generatedid: '+generatedId());
   console.log('Example app listening at http://%s:%s', host, port);
 });
