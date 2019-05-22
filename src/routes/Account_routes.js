@@ -6,7 +6,7 @@ var TopicPublisher = require('../controllers/TopicPublisher');
 
 //get route doet niets met topics
 routes.get('/account', function (req, res, next) {
-  Account.find({})
+  Account.find()
   .then((account) => res.status(200).send(account))
   .catch(next);
 });
