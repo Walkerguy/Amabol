@@ -67,9 +67,8 @@ function createAccount(msg){
 
   new_account.save(function(err, task) {
     if (err){
-        res.send(err);
+        console.log(err);
     }
-    res.json(task);
   });
 }
 
@@ -95,10 +94,10 @@ function createShoppingcart(msg){
 
   new_shoppingcart.save(function(err, task) {
       if (err){
-          res.send(err);
+         console.log(err);
+      }else{
+        TopicPublisher.sendMessageWithTopic(JSON.stringify(new_shoppingcart),"shoppingcart.created");
       }
-      TopicPublisher.sendMessageWithTopic(JSON.stringify(new_shoppingcart),"shoppingcart.created");
-      res.json(task);
   });
 }
 

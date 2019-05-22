@@ -21,7 +21,6 @@ routes.get('/shoppingcarts/:id', function (req, res) {
     ShoppingCart.find({ 'id' : req.params.id})
         .then(function (shoppingcart) {
             res.status(200).json(shoppingcart);
-            console.log(shoppingcart);
         })
         .catch((error) => {
             res.status(400).json(error);
@@ -42,27 +41,28 @@ routes.post('/Shoppingcarts', function(req, res) {
             res.send(err);
         }
         TopicPublisher.sendMessageWithTopic(JSON.stringify(new_shoppingcart),"shoppingcart.created");
-        res.json(task);
+        res.status(200).json(new_shoppingcart);
     });
 });
 
 routes.put('/Shoppingcarts/:id/addProduct/:pid', function(req, res) {
-    var pid = req.params.pid;
+    var productid = req.params.pid;
     var id = req.params.id;
 
-    Product.find({ 'id' : pid})
+    Product.find({ 'id' : productid})
         .then(function (product) {
             ShoppingCart.findOneAndUpdate({
                 query: { id: id },
                 update: { $push: { products: product.id } }
+            }).then(() => {
+                ShoppingCart.findOneAndUpdate({
+                    query: { id: id },
+                    update: { $inc: { totalPrice: product.price } }
+                }).then(() => {
+                    TopicPublisher.sendMessageWithTopic(JSON.stringify({"id": id, "product_id":productid}),"shoppingcart.added");
+                    res.json(req.body);
+                });
             });
-            ShoppingCart.findOneAndUpdate({
-                query: { id: id },
-                update: { $inc: { totalPrice: product.price } }
-            });
-            TopicPublisher.sendMessageWithTopic(JSON.stringify({"id": id, "product_id":pid}),"shoppingcart.added");
-
-            res.json(req.body);
         })
         .catch((error) => {
             res.status(400).json(error);
@@ -70,43 +70,38 @@ routes.put('/Shoppingcarts/:id/addProduct/:pid', function(req, res) {
 });
 
 routes.put('/Shoppingcarts/:id/removeProduct/:pid', function(req, res) {
-    var pid = req.params.pid;
+    var productid = req.params.pid;
     var id = req.params.id;
 
-    Product.find({ 'id' : pid})
+    Product.find({ 'id' : productid})
         .then(function (product) {
             ShoppingCart.findOneAndUpdate({
                 query: { id: id },
                 update: { $pull: { products: product.id } }
+            }).then(()=>{
+                ShoppingCart.findOneAndUpdate({
+                    query: { id: id },
+                    update: { $inc: { totalPrice: -product.price } }
+                }).then(()=>{
+                    TopicPublisher.sendMessageWithTopic(JSON.stringify({"id": id, "product_id":productid}),"shoppingcart.removed");
+                    res.json(req.body);
+                });
             });
-            ShoppingCart.findOneAndUpdate({
-                query: { id: id },
-                update: { $inc: { totalPrice: -product.price } }
-            });
-            TopicPublisher.sendMessageWithTopic(JSON.stringify({"id": id, "product_id":pid}),"shoppingcart.removed");
-
-            res.json(req.body);
         })
         .catch((error) => {
             res.status(400).json(error);
         });
-    
-
-    
 });
 
 routes.delete('/Shoppingcarts/:id', function (req, res) {
     ShoppingCart.findOneAndDelete({ 'id' : req.params.id})
-        .then(function (res) {
+        .then(()=> {
             res.status(200).json({"msg": 'Shoppingcart deleted'});
-            console.log(res);
+            TopicPublisher.sendMessageWithTopic(new_product.toString(),"shoppingcart.deleted");
         })
         .catch((error) => {
             res.status(400).json(error);
         });
-
-    TopicPublisher.sendMessageWithTopic(new_product.toString(),"shoppingcart.deleted");
-
 });
-
+            
 module.exports = routes;
