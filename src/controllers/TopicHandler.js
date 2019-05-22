@@ -40,27 +40,29 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 
 function handleMessage(msg){
     if(msg.fields.routingKey.includes("order.confirmed")){
-        updateProducts(msg);
+        updateProductAmount(msg);
     }
 }
 
-function updateProducts(msg){
+function updateProductAmount(msg){
   console.log(" [x] Recieved topic" + msg.fields.routingKey + ": %s", msg.content.toString());
-  var order = JSON.parse(msg);
-  order.productIds.array.forEach(productId => {
+  var order = JSON.parse(msg.content.toString());
+  console.log(order.productIds);
+  order.productIds.forEach(productId => {
     Product.find({"id": productId}).then(function (product){
-
+      
       oldAmount = product.amount;
-      var msg = { 'id': productId, 'oldValue' : JSON.stringify(product), 'newValue' : {"amount" : oldAmount -1}}
-      TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.updated");
+
+      Product.findOneAndUpdate({
+        query: { id: productId },
+        update: { $inc: { amount: -1 } }
+      }).then((updatedProduct)=>{
+        var productupdatemsg = { 'id': productId, 'oldValue' : JSON.stringify(product), 'newValue' : JSON.stringify(updatedProduct)}
+        TopicPublisher.sendMessageWithTopic(JSON.stringify(productupdatemsg),"product.updated");
+      });
     })
     .catch((error) => {
         res.status(400).json(error);
-    });
-
-    Product.findOneAndUpdate({
-      query: { id: productId },
-      update: { $inc: { amount: -1 } }
     });
   });
 }

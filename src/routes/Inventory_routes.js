@@ -10,7 +10,6 @@ routes.get('/products', function (req, res) {
     Product.find()
         .then(function (products) {
             res.status(200).json(products);
-            console.log(products);
         })
         .catch((error) => {
             res.status(400).json(error);
@@ -40,12 +39,9 @@ routes.post('/products', function(req, res) {
         if (err){
             res.send(err);
         }
+        TopicPublisher.sendMessageWithTopic(JSON.stringify(new_product),"product.created");
+        res.json(req.body);
     });
-
-    TopicPublisher.sendMessageWithTopic(JSON.stringify(new_product),"product.created");
-        
-    res.json(req.body);
-    
 });
 
 routes.put('/products/:id', function(req, res) {
@@ -74,14 +70,12 @@ routes.delete('/products/:id', function (req, res) {
     Product.findOneAndDelete({ 'id' : req.params.id})
         .then(function (res) {
             res.status(200).json({"msg": 'product deleted'});
-            console.log(res);
         })
         .catch((error) => {
             res.status(400).json(error);
         });
 
     TopicPublisher.sendMessageWithTopic(req.params.id,"product.deleted");
-
 });
 
 module.exports = routes;
