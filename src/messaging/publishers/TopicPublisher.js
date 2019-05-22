@@ -1,7 +1,7 @@
 var amqp = require('amqplib/callback_api');
 
 module.exports.sendMessageWithTopic =  function(msg,key) {
-  amqp.connect('amqp://localhost', function(error0, connection) {
+  amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
     if (error0) {
         throw error0;
       }
@@ -27,6 +27,3 @@ module.exports.sendMessageWithTopic =  function(msg,key) {
       }, 500);
     });
 }
-
-
-

@@ -1,7 +1,6 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-
 var mongodb = require('./src/config/mongo.db');
 var environment = require('./src/config/environment');
 
@@ -9,13 +8,9 @@ var environment = require('./src/config/environment');
 // var MessagePublisher = require("./src/messaging/publishers/MessagePublisher");
 // var OrderPublisher = require("./src/messaging/publishers/OrderPublisher");
 // var TopicPublisher = require("./src/messaging/publishers/TopicPublisher");
-var Topics = ['#.inventory.#',"cool"] // Topics.
+var Topics = ['account.#','product.#','order.#'] // Topics.
 
-// All receivers.
-// var AllHandler = require("./src/messaging/receivers/_AllHandler");
-// var AccountHandler = require("./src/messaging/receivers/AccountHandler");
-// var ProductHandler = require("./src/messaging/receivers/ProductHandler");
-
+var TopicHandler = require("./src/messaging/receivers/TopicHandler");
 
 var TicketRoutes = require('./src/routes/TicketRoutes');
 
@@ -26,7 +21,7 @@ app.get('/', function (req, res) {
 });
 
 // Send out custom messages.
-// app.get('/publish', MessagePublisher.sendMessage);
+// app.get('/publish', Mes  sagePublisher.sendMessage);
 // app.get('/publish/:text', MessagePublisher.sendMessage);
 
 app.use('/ticket', TicketRoutes);

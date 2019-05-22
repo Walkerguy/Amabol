@@ -3,23 +3,10 @@ var routes = express.Router();
 //var mongodb = require('../config/mongo.db');
 var Account = require('../models/Account');
 var Ticket = require('../models/Ticket');
+var Product = require('../models/Product');
+var Order = require('../models/Order');
+
 var TopicPublisher = require('../messaging/publishers/TopicPublisher');
-
-routes.post('/', function(req, res, err) {
-    const newTicket = req.body;
-
-    // Important, create a unique id here.
-    const generatedId = require('uuid/v1'); 
-    newTicket.Id = generatedId();
-
-    console.log(newTicket.Id);
-
-    Ticket.create(newTicket)
-    .then(ticket => res.send(ticket))
-    .catch((err) => {
-        console.log(err);
-    });
-});
 
 routes.get('/', function (req, res, next) {
     Ticket.find({})
@@ -33,12 +20,27 @@ routes.get('/:id', function (req, res, next) {
         .catch(next);
 });
 
+routes.post('/', function(req, res, err) {
+    const newTicket = req.body;
+    const generatedId = require('uuid/v1'); 
+    newTicket.Id = generatedId();
+
+    console.log(newTicket.Id);
+
+    Ticket.create(newTicket)
+    .then(ticket => res.send(ticket))
+    .catch((err) => {
+        console.log(err);
+    });
+});
+
 routes.put('/:id', function (req, res, next) {
-    const ticketId = req.params.id;
-    const updatedTicket = req.body;
+         ticketId = req.params.id;
+         const updatedTicket = req.body;
 
     Ticket.findOneAndUpdate({Id: ticketId}, updatedTicket)
     .then(ticket => res.send(ticket))
+    
     .catch(next);
 });
 

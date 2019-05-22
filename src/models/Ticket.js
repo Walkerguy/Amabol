@@ -6,19 +6,9 @@ const TicketSchema = new Schema({
         type: String,
         required: true
     },
-    account:{
-        id:{
-            type: String,
-            required: true
-        },
-        name: {
-            type: String,
-            required: true
-        },
-        email: { 
-            type: String,
-            required: true
-        }
+    account_id: {
+        type: String,
+        required: true
     },
     title: {
         type: String,
