@@ -19,10 +19,13 @@ const OrderSchema = new Schema({
     },
 
     // Products array.
-    products: [{
-        type: Schema.Types.ObjectId,
-        ref: "Product"
-    }]
+    productsIds: [{
+        type: String
+    }],
+
+    totalPrice: {
+        type: Number  
+    },
 
 }, { collection: 'Order' });
 
