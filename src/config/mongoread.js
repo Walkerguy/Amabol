@@ -4,11 +4,11 @@ const environment   = require('./environment');
 
 // Gebruik ES6 promises i.p.v. Mongoose mpromise.
 mongoose.Promise = global.Promise;
-console.log("test " + environment.dburlread);
-mongoose.connect(environment.dburlread);
+console.log("test " + environment.dburlwrite);
+mongoose.connect(environment.dburlwrite);
 var connection = mongoose.connection
-    .once('open', () => console.log('[Database] Verbonden met Mongo op ' + environment.dburlread))
-    .on('error', (error) => {console.warn('Warning', error.toString());
+  .once('open', () => console.log('[Database] Verbonden met Mongo op ' + environment.dburlwrite))
+  .on('error', (error) => {console.warn('Warning', error.toString());
   });
 
 // Connectie.

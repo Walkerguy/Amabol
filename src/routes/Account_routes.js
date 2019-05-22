@@ -3,12 +3,19 @@ var routes = express.Router();
 var Account = require('../models/Account');
 var TopicPublisher = require('../controllers/TopicPublisher');
 
+var mongodbread = require('./../../src/config/mongo.db');
+var mongodbwrite = require('./../../src/config/mongoread');
 
 //get route doet niets met topics
 routes.get('/account', function (req, res, next) {
-  Account.find({})
-  .then((account) => res.status(200).send(account))
-  .catch(next);
+
+  mongodbread.prototype.db.find({})
+    .then((account) => res.status(200).send(account))
+    .catch(next);
+
+  // Account.find({})
+  // .then((account) => res.status(200).send(account))
+  // .catch(next);
 });
 
 //een post van een account
