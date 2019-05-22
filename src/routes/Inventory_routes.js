@@ -49,11 +49,10 @@ routes.put('/products/:id', function(req, res) {
 
     Product.find({ 'id' : id })
         .then(function (product) {
-            console.log(product);
-            var msg = { 'id': id, 'oldValue' : product, 'newValue' : req.body}
-            TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.updated");
             Product.updateOne({ id: id },{ $set : req.body }).then(function (newProduct){
                 res.status(200).json(newProduct);
+                var msg = { 'id': id, 'oldValue' : product, 'newValue' : newProduct}
+                TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.updated");
             }).catch((error) => {
                 console.log(error);
             });
@@ -61,21 +60,17 @@ routes.put('/products/:id', function(req, res) {
         .catch((error) => {
             console.log(error);
         });
-
-    
-   
 });
 
 routes.delete('/products/:id', function (req, res) {
     Product.findOneAndDelete({ 'id' : req.params.id})
         .then(function (res) {
             res.status(200).json({"msg": 'product deleted'});
+            TopicPublisher.sendMessageWithTopic(JSON.stringify({ "id" : req.params.id}),"product.deleted");
         })
         .catch((error) => {
             res.status(400).json(error);
         });
-
-    TopicPublisher.sendMessageWithTopic(req.params.id,"product.deleted");
 });
 
 module.exports = routes;
