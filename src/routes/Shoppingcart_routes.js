@@ -1,14 +1,14 @@
 var express = require('express');
 var routes = express.Router();
 //var mongodb = require('../config/mongo.db');
-var ShoppingCart = require('../models/ShoppingCart');
+var Shoppingcart = require('../models/Shoppingcart');
 var Product = require('../models/Product');
 var TopicPublisher = require('../controllers/TopicPublisher');
 var uuidv1 = require('uuid/v1');
 
 routes.get('/shoppingcarts', function (req, res) {
     res.contentType('application/json');
-    ShoppingCart.find()
+    Shoppingcart.find()
         .then(function (shoppingcarts) {
             res.status(200).json(shoppingcarts);
         })
@@ -18,7 +18,7 @@ routes.get('/shoppingcarts', function (req, res) {
 });
 
 routes.get('/shoppingcarts/:id', function (req, res) {
-    ShoppingCart.find({ 'id' : req.params.id})
+    Shoppingcart.find({ 'id' : req.params.id})
         .then(function (shoppingcart) {
             res.status(200).json(shoppingcart);
         })
@@ -28,8 +28,7 @@ routes.get('/shoppingcarts/:id', function (req, res) {
 });
 
 routes.post('/Shoppingcarts', function(req, res) {
-
-    var new_shoppingcart = new ShoppingCart({
+    var new_shoppingcart = new Shoppingcart({
         id: uuidv1(),
         account_id: req.body.account_id,
         products: [],
@@ -48,26 +47,27 @@ routes.post('/Shoppingcarts', function(req, res) {
 routes.put('/Shoppingcarts/:id/addProduct/:pid', function(req, res) {
     var productid = req.params.pid;
     var id = req.params.id;
+    
+    //var limitreached = false;
 
-    Product.find({ 'id' : productid})
-        .then(function (product) {
-            ShoppingCart.findOneAndUpdate({
-                query: { id: id },
-                update: { $push: { products: product.id } }
-            }).then(() => {
-                ShoppingCart.findOneAndUpdate({
-                    query: { id: id },
-                    update: { $inc: { totalPrice: product.price } }
-                }).then(() => {
-                    TopicPublisher.sendMessageWithTopic(JSON.stringify({"id": id, "product_id":productid}),"shoppingcart.added");
-                    res.json(req.body);
-                });
-            });
-        })
-        .catch((error) => {
-            res.status(400).json(error);
-        });
-});
+    // Check if amount of products is not more than 20. ABANDONED.
+    /*Shoppingcart.findOne({ id: req.params.id }, function (err, foundcart) {
+        console.log(foundcart);
+        var count = Shoppingcart.aggregate([{$match: {id: req.params.id}}, {$project: {products: {$size: '$products'}}}]);
+        console.log(count);
+
+        console.log(foundcart.products.length);
+        var count = foundcart.products.toArray().length;
+        if(count >= 20){
+            console.log(count)
+            limitreached = true;
+        }
+    });*/
+
+    Shoppingcart.findOneAndUpdate({id: req.params.id}, {$push: {productIds: productid}});
+    TopicPublisher.sendMessageWithTopic(JSON.stringify({"id": id, "product_id": productid}), "shoppingcart.added");
+    res.json(req.body);
+});           
 
 routes.put('/Shoppingcarts/:id/removeProduct/:pid', function(req, res) {
     var productid = req.params.pid;
@@ -75,11 +75,11 @@ routes.put('/Shoppingcarts/:id/removeProduct/:pid', function(req, res) {
 
     Product.find({ 'id' : productid})
         .then(function (product) {
-            ShoppingCart.findOneAndUpdate({
+            Shoppingcart.findOneAndUpdate({
                 query: { id: id },
                 update: { $pull: { products: product.id } }
             }).then(()=>{
-                ShoppingCart.findOneAndUpdate({
+                Shoppingcart.findOneAndUpdate({
                     query: { id: id },
                     update: { $inc: { totalPrice: -product.price } }
                 }).then(()=>{
@@ -94,7 +94,7 @@ routes.put('/Shoppingcarts/:id/removeProduct/:pid', function(req, res) {
 });
 
 routes.delete('/Shoppingcarts/:id', function (req, res) {
-    ShoppingCart.findOneAndDelete({ 'id' : req.params.id})
+    Shoppingcart.findOneAndDelete({ 'id' : req.params.id})
         .then(()=> {
             res.status(200).json({"msg": 'Shoppingcart deleted'});
             TopicPublisher.sendMessageWithTopic(new_product.toString(),"shoppingcart.deleted");
@@ -103,5 +103,5 @@ routes.delete('/Shoppingcarts/:id', function (req, res) {
             res.status(400).json(error);
         });
 });
-            
+ 
 module.exports = routes;

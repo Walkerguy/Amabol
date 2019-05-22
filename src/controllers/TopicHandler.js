@@ -1,7 +1,7 @@
 var amqp = require('amqplib/callback_api');
 var Account = require('../models/Account');
 var Product = require('../models/Product');
-var ShoppingCart = require('../models/ShoppingCart');
+var Shoppingcart = require('../models/Shoppingcart');
 var uuidv1 = require('uuid/v1');
 
 exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
@@ -85,7 +85,7 @@ function updateAccount(msg){
 function createShoppingcart(msg){
   console.log(" [x] creating Shoppingcart: " + msg.content.toString());
   var account = JSON.parse(msg.content.toString());
-  var new_shoppingcart = new ShoppingCart({
+  var new_shoppingcart = new Shoppingcart({
     id: uuidv1(),
     account_id: account.id,
     Products: [],
