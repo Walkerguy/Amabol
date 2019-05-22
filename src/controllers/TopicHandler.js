@@ -40,7 +40,7 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 }
 
 function handleMessage(msg){
-    if(msg.fields.routingKey.includes("account.create")){
+    if(msg.fields.routingKey.includes("account.created")){
       createAccount(msg);
       createShoppingcart(msg);
     }
