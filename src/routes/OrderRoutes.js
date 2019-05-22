@@ -3,20 +3,18 @@ var routes = express.Router();
 var Order = require('../models/Order');
 var OrderPublisher = require('../messaging/publishers/OrderPublisher');
 
-routes.post('/', function(req, res, err) {
+routes.post('/', function(req, res) {
     const newOrder = req.body;
-
+    
     // Important, create a unique id here.
     const generatedId = require('uuid/v1'); 
     newOrder.id = generatedId();
 
-    Order.create(newOrder)
-        .then(order => {
-            OrderPublisher.sendMessageWithTopic(JSON.stringify(order), 'order.created')}),
-            res.send(order)
-        .catch((err) => {
-            console.log(err);
-    });
+    Order.create(newOrder, function(req, madeOrder) 
+    {
+        OrderPublisher.sendMessageWithTopic(JSON.stringify({madeOrder}), "order.created");
+        res.json(madeOrder);
+    })
 });
 
 routes.get('/', function (req, res, next) {
@@ -35,28 +33,47 @@ routes.put('/:id', function (req, res, next) {
     const orderId = req.params.id;
     const updatedOrder = req.body;
 
-    Order.updateOne({id: orderId}, updatedOrder)
-        .then(order => res.send(order)).then(console.log("[RABBITMQ] Put a UPDATED event here."))
-        .catch(next);
-});
+    Order.updateOne({id: orderId}, {updatedOrder}).then(function(madeOrder) 
+    {
+        OrderPublisher.sendMessageWithTopic(JSON.stringify({madeOrder}), "order.updated");
+        res.json(madeOrder);
+    }).catch((error) => {
+        console.log(error);
+    });
+})
 
 routes.delete('/:id', function (req, res, next) {
-    Order.deleteOne({id: req.params.id})
-        .then((order) => res.send(order)).then(console.log("[RABBITMQ] Put a DELETED event here."))
-        .catch(next);
+    Order.deleteOne({id: req.params.id}, function(req, madeOrder) 
+    {
+        OrderPublisher.sendMessageWithTopic(JSON.stringify({madeOrder}), "order.deleted");
+        res.json(madeOrder);
+    })
 });
 
+// Why doesn't this work...
 routes.delete('/deleteall', function (req, res, next) {
     Order.deleteMany({})
         .then((order) => res.send(order))
         .catch(next);
 });
 
-// Order finalized.
-routes.put('/confirmed', function (req, res, next) {
-    Order.updateOne({id: req.body.id}, { status: "Confirmed."})
-        .then(order => res.send(order)).then(console.log("[RABBITMQ] Put a CONFIRMED event here."))
-        .catch(next);
+// Order finalized, becomes a delivery now.
+routes.put('/:id/confirmed', function (req, res, next) {
+    var orderid = req.params.id;
+
+    Order.updateOne({id: orderid}, { status: "Confirmed."}).then (function(req, madeOrder) 
+    {
+        Order.findOne({id: orderid}).then (function(req, confirmedOrder) 
+        {
+            OrderPublisher.sendMessageWithTopic(JSON.stringify({confirmedOrder}), "order.confirmed");
+            res.json(confirmedOrder);
+        }).catch((error) => {
+            console.log(error);
+        });
+        
+    }).catch((error) => {
+        console.log(error);
+    });
 });
 
 module.exports = routes;
