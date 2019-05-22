@@ -11,10 +11,9 @@ const ProductSchema = new Schema({
         required: true
     },
     description: {
-        type: String,
-        required: false
+        type: String
     },
-    
+
     amount: {
         type: String,
         required: true

@@ -11,7 +11,9 @@ routes.post('/', function(req, res, err) {
     newOrder.id = generatedId();
 
     Order.create(newOrder)
-        .then(order => res.send(order)).then(OrderPublisher.sendMessageWithTopic(JSON.stringify(newOrder), 'order.created'))
+        .then(order => {
+            OrderPublisher.sendMessageWithTopic(JSON.stringify(order), 'order.created')}),
+            res.send(order)
         .catch((err) => {
             console.log(err);
     });

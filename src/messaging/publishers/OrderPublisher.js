@@ -13,7 +13,7 @@ module.exports.sendMessageWithTopic =  function(msg,key) {
         var exchange = 'topic_exchange';
 
         channel.assertExchange(exchange, 'topic', {
-          durable: false
+          durable: true
         });
         
         // The actual sending.
