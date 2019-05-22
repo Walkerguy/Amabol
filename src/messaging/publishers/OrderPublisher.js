@@ -10,18 +10,15 @@ module.exports.sendMessageWithTopic =  function(msg,key) {
           throw error1;
         }
 
-        var exchange = 'topic_logs';
-        var args = process.argv.slice(2);
-        var key = req.params.topic || 'anonymous.info';
-        var msg = req.params.text || 'Hello World!';
-    
+        var exchange = 'topic_exchange';
+
         channel.assertExchange(exchange, 'topic', {
           durable: false
         });
         
+        // The actual sending.
         channel.publish(exchange, key, Buffer.from(msg));
-        console.log(" [x] Sent %s:'%s'", key, msg);
-        //res.send('<h1> Topic' + key + ' Send: ' + msg + '</h1>');
+        console.log("[Order Service] Sent %s:'%s'", key, msg);
       });
     
       setTimeout(function() { 

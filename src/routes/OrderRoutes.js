@@ -11,10 +11,10 @@ routes.post('/', function(req, res, err) {
     newOrder.id = generatedId();
 
     Order.create(newOrder)
-        .then(order => res.send(order)).then(console.log("[RABBITMQ] Put a CREATED event here."))
+        .then(order => res.send(order)).then(OrderPublisher.sendMessageWithTopic(JSON.stringify(newOrder), 'order.created'))
         .catch((err) => {
             console.log(err);
-        });
+    });
 });
 
 routes.get('/', function (req, res, next) {
@@ -51,7 +51,7 @@ routes.delete('/deleteall', function (req, res, next) {
 });
 
 // Order finalized.
-routes.post('/confirmed', function (req, res, next) {
+routes.put('/confirmed', function (req, res, next) {
     Order.updateOne({id: req.body.id}, { status: "Confirmed."})
         .then(order => res.send(order)).then(console.log("[RABBITMQ] Put a CONFIRMED event here."))
         .catch(next);

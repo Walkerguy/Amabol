@@ -1,24 +1,17 @@
-var express = require('express');
-var app = express();
-const cors = require('cors');
-var bodyParser = require('body-parser');
+var express         = require('express');
+var app             = express();
+var cors            = require('cors');
+var bodyParser      = require('body-parser');
 
-var mongodb = require('./src/config/mongo.db');
-var environment = require('./src/config/environment');
+var mongodb         = require('./src/config/mongo.db');
+var environment     = require('./src/config/environment');
 
-// All publishers.
-var MessagePublisher = require("./src/messaging/publishers/MessagePublisher");
-var OrderPublisher = require("./src/messaging/publishers/OrderPublisher");
-var TopicPublisher = require("./src/messaging/publishers/TopicPublisher");
-var Topics = ['#.inventory.#',"cool"] // Topics.
+// Messaging.
+var Topics          = ['product.#','shoppingcart.#', 'account.#', 'delivery.#'] // Topics.
+var OrderHandler    = require("./src/messaging/receivers/OrderHandler");
 
-// All receivers.
-var AllHandler = require("./src/messaging/receivers/_AllHandler");
-var ShoppingcartHandler = require("./src/messaging/receivers/OrderHandler");
-var ProductHandler = require("./src/messaging/receivers/ProductHandler");
-
-
-var OrderRoutes = require('./src/routes/OrderRoutes');
+var OrderRoutes     = require('./src/routes/OrderRoutes');
+var TestingRoutes   = require('./src/routes/TestingRoutes');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -28,9 +21,7 @@ app.get('/', function (req, res) {
 });
 
 // Send out custom messages.
-app.get('/publish', MessagePublisher.sendMessage);
-app.get('/publish/:text', MessagePublisher.sendMessage);
-
+app.use('/', TestingRoutes);
 app.use('/order', OrderRoutes);
 
 var server = app.listen(8888, function () {
@@ -38,8 +29,7 @@ var server = app.listen(8888, function () {
   var port = server.address().port;
 
   // Add message listeners here.
-  // MessageHandler.listen("logs");
-  // TopicHandler.listen("topic_exchange",Topics);
+  OrderHandler.listen("topic_exchange", Topics);
 
   console.log('[SERVER] Listening at %s:%s.', host, port);
 });
