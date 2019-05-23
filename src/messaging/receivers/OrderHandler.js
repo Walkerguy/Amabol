@@ -200,14 +200,3 @@ function updateProduct(msg){
 
   Product.updateOne({ id: id }, update);
 }
-
-function deleteProduct(msg){
-  var remove = JSON.parse(msg.content.toString());
-  var id = remove.id;
-
-  Product.deleteOne({ id: id }, { 
-    if (err){
-      console.log(err);
-    }
-  });
-}
