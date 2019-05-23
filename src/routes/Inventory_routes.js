@@ -37,10 +37,11 @@ routes.post('/products', function(req, res) {
 
     new_product.save(function(err, task) {
         if (err){
+            console.log(err);
             res.send(err);
         }
         TopicPublisher.sendMessageWithTopic(JSON.stringify(new_product),"product.created");
-        res.json(req.body);
+        res.status(200).json(new_product);
     });
 });
 
