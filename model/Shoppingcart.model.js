@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Product = require("./Product");
 
-const TicketSchema = new Schema({
+const ShoppingcartSchema = new Schema({
     id: {
         type: String,
         required: true
@@ -10,20 +11,17 @@ const TicketSchema = new Schema({
         type: String,
         required: true
     },
-    title: {
-        type: String,
+    Products: {
+        type: [],
         required: true
     },
-    description: {
-        type: String,
+    totalPrice: {
+        type: Number,
         required: true
-    },
-    order: {
-        type: String
     }
 });
 
 
-const Ticket = mongoose.model('ticket', TicketSchema);
+const Shoppingcart = mongoose.model('shoppingcart', ShoppingcartSchema);
 
-module.exports = Ticket;
+module.exports = Shoppingcart;

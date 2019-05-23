@@ -2,11 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const OrderSchema = new Schema({
-    id: {
-        type: String,
-        required: true
-    },
-
+  id:{
+    type: String,
+    required: true
+  },
     // Who made the order.
     buyer:{
         type: Schema.Types.ObjectId,
@@ -20,13 +19,15 @@ const OrderSchema = new Schema({
     },
 
     // Products array.
-    productIds: [{
-        type: String
+    products: [{
+        name: { type: String},
+        description: { type: String},
+        price: {type: Number}
     }],
 
     totalPrice: {
-        type: Number
-    }
+        type: Number  
+    },
 
 }, { collection: 'Order' });
 

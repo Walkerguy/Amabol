@@ -1,0 +1,49 @@
+version: "3.1"
+services:
+
+#Account
+    mongoAccount:
+          image: mongo
+          restart: always
+          ports:
+            - 27017:27017
+#Orders
+    mongoOrders:
+          image: mongo
+          restart: always
+          ports:
+            - 27016:27017
+#Shopping Cart
+    mongoShoppingCart:
+          image: mongo
+          restart: always
+          ports:
+            - 27018:27017
+#Helpdesk
+    mongoHelpDesk:
+          image: mongo
+          restart: always
+          ports:
+            - 27019:27017
+#Logistics
+    mongoLogistics:
+          image: mongo
+          restart: always
+          ports:
+            - 27020:27017
+#Inventory
+    mongoInventory:
+          image: mongo
+          restart: always
+          ports:
+            - 27021:27017
+#Logging
+    mongoLogging:
+          image: mongo
+          restart: always
+          ports:
+            - 27022:27017
+
+#Node Servers hieronder
+#    loggerService:
+#          image: node:11
