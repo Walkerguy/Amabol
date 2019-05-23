@@ -41,6 +41,19 @@ module.exports.updateOrder = function(msg){
     }).catch((error) => {
         console.log(error);
     });
+
+    for(var i =0;i >= update.products.length;i++){
+        Product.findOne({id: update.product[i]}).then((product)=>{
+            Order.updateOne({
+                query: { id: id },
+                update: { $push : { products : product} }
+            }).then(function (Order){
+                  console.log(Order);
+              }).catch((error) => {
+                  console.log(error);
+              });
+        })
+    }
 }
 
 module.exports.deleteOrder = function(msg){
