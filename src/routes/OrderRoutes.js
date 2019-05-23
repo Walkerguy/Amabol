@@ -33,10 +33,16 @@ routes.put('/:id', function (req, res, next) {
     const orderId = req.params.id;
     const updatedOrder = req.body;
 
-    Order.updateOne({id: orderId}, {updatedOrder}).then(function(madeOrder) 
+    Order.updateOne({id: orderId}, {updatedOrder}).then (function(madeOrder) 
     {
-        OrderPublisher.sendMessageWithTopic(JSON.stringify({madeOrder}), "order.updated");
-        res.json(madeOrder);
+        Order.findOne({id: orderId}).then (function(updatedOrder) 
+        {
+            OrderPublisher.sendMessageWithTopic(JSON.stringify({updatedOrder}), "order.updated");
+            res.json(updatedOrder);
+        }).catch((error) => {
+            console.log(error);
+        });
+        
     }).catch((error) => {
         console.log(error);
     });
@@ -61,9 +67,9 @@ routes.delete('/deleteall', function (req, res, next) {
 routes.put('/:id/confirmed', function (req, res, next) {
     var orderid = req.params.id;
 
-    Order.updateOne({id: orderid}, { status: "Confirmed."}).then (function(req, madeOrder) 
+    Order.updateOne({id: orderid}, { status: "Confirmed."}).then (function(madeOrder) 
     {
-        Order.findOne({id: orderid}).then (function(req, confirmedOrder) 
+        Order.findOne({id: orderid}).then (function(confirmedOrder) 
         {
             OrderPublisher.sendMessageWithTopic(JSON.stringify({confirmedOrder}), "order.confirmed");
             res.json(confirmedOrder);

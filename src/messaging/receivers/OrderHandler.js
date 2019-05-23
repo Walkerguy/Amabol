@@ -50,9 +50,7 @@ function handleMessage(msg){
   }
 
   // Updates order status if logistics sends it.
-  if(msg.fields.routingKey.includes("delivery.confirmed")){
-    deliveryConfirmed(msg);
-  }
+  if(msg.fields.routingKey.includes("delivery.confirmed")){deliveryConfirmed(msg);}
 
   // Account CRUD.
   if(msg.fields.routingKey.includes("account.created")){createAccount(msg);}
