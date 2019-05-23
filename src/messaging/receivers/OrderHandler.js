@@ -72,19 +72,12 @@ function createShoppingcart(msg){
 
   var newShoppingcart = new Shoppingcart({
     id: cart.id,
-    account_id: car.account_id,
+    account_id: cart.account_id,
     products: cart.products,
     totalPrice: cart.totalPrice
   });
 
   newShoppingcart.save(function(err, task) {
-    if (err){
-      console.log(err);
-    }
-  });
-  
-
-  newOrder.save(function(err, task) {
     if (err){
       console.log(err);
     }
@@ -97,17 +90,21 @@ function createOrder(msg){
   var newShoppingcart = new Shoppingcart(JSON.parse(msg.content.toString()));
 
   var newOrder = new Order({
-    buyer: newShoppingcart.id,
-    shoppingcart: newShoppingcart.name,
-    totalPrice: newShoppingcart.address
+    buyer: newShoppingcart.account_id,
+    shoppingcart: newShoppingcart.products,
+    totalPrice: newShoppingcart.totalPrice
   });
   
-  // Make the new order, and notify the rest.
-  Order.create(newOrder)
-    .then(order => res.send(order)).then(OrderPublisher.sendMessageWithTopic(JSON.stringify(newOrder), 'order.created'))
-    .catch((err) => {
-        console.log(err);
-    });
+    // Make the new order, and notify the rest.
+    // Important, create a unique id here.
+    const generatedId = require('uuid/v1'); 
+    newOrder.id = generatedId();
+
+    Order.create(newOrder, function(req, madeOrder) 
+    {
+        OrderPublisher.sendMessageWithTopic(JSON.stringify({madeOrder}), "order.created");
+        res.json(madeOrder);
+    })
 }
 
 function deliveryConfirmed(msg){
