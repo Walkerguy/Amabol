@@ -5,6 +5,7 @@ var Account = require('../models/Account');
 var Ticket = require('../models/Ticket');
 var Product = require('../models/Product');
 var Order = require('../models/Order');
+var uuidv1 = require('uuid/v1');
 
 var TopicPublisher = require('../messaging/publishers/TopicPublisher');
 
@@ -20,18 +21,24 @@ routes.get('/:id', function (req, res, next) {
         .catch(next);
 });
 
+//POST
 routes.post('/', function(req, res, err) {
-    const newTicket = req.body;
-    const generatedId = require('uuid/v1'); 
-    newTicket.Id = generatedId();
-
-    console.log(newTicket.Id);
-
-    Ticket.create(newTicket)
-    .then(ticket => res.send(ticket))
-    .catch((err) => {
-        console.log(err);
+    
+    var new_ticket = new Ticket({
+        id: uuidv1(),
+        account_id: req.body.account_id,
+        title: req.body.title,
+        description: req.body.description,
+        order: req.body.order
     });
+
+    new_ticket.save(function(err, task) {
+        if (err){
+            res.send(err);
+        }
+        TopicPublisher.sendMessageWithTopic(JSON.stringify(new_ticket),"ticket.created");
+        res.json(req.body);
+    })
 });
 
 routes.put('/:id', function (req, res, next) {
