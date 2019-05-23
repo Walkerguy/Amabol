@@ -19,7 +19,7 @@ const OrderSchema = new Schema({
     },
 
     // Products array.
-    productIds: [{
+    products: [{
         type: String
     }],
 

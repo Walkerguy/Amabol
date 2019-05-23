@@ -55,26 +55,14 @@ function handleMessage(msg){
   }
 
   // Account CRUD.
-  if(msg.fields.routingKey.includes("account.created")){
-    createAccount(msg);
-  }
-  if(msg.fields.routingKey.includes("account.created")){
-    updateAccount(msg);
-  }
-  if(msg.fields.routingKey.includes("account.created")){
-    deleteAccount(msg);
-  }
+  if(msg.fields.routingKey.includes("account.created")){createAccount(msg);}
+  if(msg.fields.routingKey.includes("account.updated")){updateAccount(msg);}
+  if(msg.fields.routingKey.includes("account.deleted")){deleteAccount(msg);}
 
   // Product CRUD.
-  if(msg.fields.routingKey.includes("product.created")){
-    createProduct(msg);
-  }
-  if(msg.fields.routingKey.includes("product.created")){
-    updateProduct(msg);
-  }
-  if(msg.fields.routingKey.includes("product.created")){
-    deleteProduct(msg);
-  }
+  if(msg.fields.routingKey.includes("product.created")){createProduct(msg);}
+  if(msg.fields.routingKey.includes("product.updated")){updateProduct(msg);}
+  if(msg.fields.routingKey.includes("product.deleted")){deleteProduct(msg);}
 }
 
 // Make a shoppingcart.
@@ -85,7 +73,7 @@ function createShoppingcart(msg){
   var newShoppingcart = new Shoppingcart({
     id: cart.id,
     account_id: car.account_id,
-    productIds: cart.productIds,
+    products: cart.products,
     totalPrice: cart.totalPrice
   });
 

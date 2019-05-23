@@ -11,7 +11,7 @@ const ShoppingcartSchema = new Schema({
         required: true
     },
     
-    productIds: [{
+    products: [{
         type: String
     }],
     
