@@ -14,7 +14,7 @@ app.use(bodyParser.json({
   type: 'application/vnd.api+json'
 }));
 
-var Topics = ['order.#']
+var Topics = ['order.#','account.#']
 
 var logistics = require('./routes/shippings')
 

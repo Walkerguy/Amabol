@@ -2,6 +2,7 @@ var express = require('express');
 var routes = express.Router();
 var mongodb = require('./../config/mongo.db');
 var Shipping = require('./../model/shipping.model');
+var DeliveryPublisher = require('./../src/controllers/DeliveryPublisher');
 
 const generatedId = require('uuid/v1');
 
@@ -62,5 +63,25 @@ routes.delete('/:id', function (req,res,next) {
     .then(shipping => res.send(shipping))
     .catch(next);
 })
+
+routes.put('/shipmentdelivered/:id', function (req,res) {
+  const body = req.body;
+  const shipmentId = req.params.id;
+
+  const changedShipment = {
+    id: shipmentId,
+    deliveryAddress: body.deliveryAddress,
+    status: 'Shipment is now delivered!',
+    products: body.products
+  }
+
+  Shipping.updateOne({id: shipmentId}, {changedShipment}).then(function (madeShipment) {
+    DeliveryPublisher.sendMessageWithTopic(JSON.stringify({madeShipment}), 'shipping.delivered');
+    res.json(madeShipment);
+  }).catch((error) => {
+    console.log(error);
+  });
+})
+
 
 module.exports = routes;

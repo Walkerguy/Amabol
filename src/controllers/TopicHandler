@@ -1,6 +1,7 @@
 var amqp = require('amqplib/callback_api');
 var mongodb = require('./../../config/mongo.db');
-var Shipping = require('./../../model/shipping.model')
+var Shipping = require('./../../model/shipping.model');
+var Account = require('./../../model/account.model');
 
 exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
   if (error0) {
@@ -46,14 +47,24 @@ function handleMessage(msg){
   if(msg.fields.routingKey.includes('order.confirmed')){
     newShipping(msg);
   }
+  if(msg.fields.routingKey.includes('account.created')){
+    createAccount(msg);
+  }
 }
 
 function newShipping(msg){
   console.log('received topics: ' + msg.fields.routingKey + ' and '+msg.content.toString());
   var shipping = JSON.parse(msg.content.toString());
+  var accountFromShipping;
+
+  Account.findOne({id: shipping.buyer.id})
+    .then((account) => {
+      accountFromShipping = account;
+    })
+
   var new_shipping = new Shipping({
     id: shipping.id,
-    deliveryAddress: shipping.buyer.address,
+    deliveryAddress: accountFromShipping.address,
     status: "OrderConfirmed",
     products: shipping.productsIds
   })
@@ -62,4 +73,28 @@ function newShipping(msg){
       console.log(error);
     }
   })
+}
+
+function createAccount(msg){
+  console.log("[Order Service] creating Account: " + msg.content.toString());
+  var account = JSON.parse(msg.content.toString());
+
+  console.log(account.address);
+
+  var newAccount = new Account({
+    id: account.id,
+    name: account.name,
+    address: account.address,
+    postalcode: account.postalcode,
+    city: account.city,
+    email: account.email,
+    phone: account.phone,
+    type: account.type,
+  });
+
+  newAccount.save(function(err, task) {
+    if (err){
+      console.log(err);
+    }
+  });
 }

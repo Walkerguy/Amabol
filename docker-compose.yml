@@ -1,0 +1,158 @@
+version: "3.5"
+
+services:
+#Logistics
+    loggerservice:
+          build: ./loggerservice
+          links:
+            - mongoLogging
+          networks:
+            - backend
+          depends_on:
+            - mongoLogging
+          ports:
+            - '9001:8888'
+
+    shoppingcart:
+          build: ./shoppingcartservice
+          links:
+            - mongoShoppingCart
+          networks:
+            - backend
+          depends_on:
+            - mongoShoppingCart
+          ports:
+            - '8891:8888'
+
+    accountservice:
+          build: ./accountservice
+          links:
+            - mongoAccount
+          networks:
+            - backend
+          depends_on:
+            - mongoAccount
+          ports:
+            - '9891:8888'
+
+    ordermanagementservice:
+           build: ./ordermanagementservice
+           links:
+            - mongoOrders
+           networks:
+            - backend
+           depends_on:
+             - mongoOrders
+           ports:
+             - '9893:8888'
+
+    helpdeskservice:
+           build: ./helpdeskservice
+           links:
+            - mongoHelpDesk
+           networks:
+            - backend
+           depends_on:
+             - mongoHelpDesk
+           ports:
+             - '9000:8888'
+
+    inventoryservice:
+          build: ./inventoryservice
+          links:
+            - mongoInventory
+          networks:
+            - backend
+          depends_on:
+            - mongoInventory
+          ports:
+            - '8890:8888'
+
+    logisticsservice:
+          build: ./logisticsservice
+          links:
+            - mongoLogistics
+          networks:
+            - backend
+          depends_on:
+            - mongoLogistics
+          ports:
+            - '8894:8888'
+
+#Account
+    mongoAccount:
+          image: mongo
+          networks:
+            - backend
+          restart: always
+          command: mongod --port 27017 --bind_ip_all
+#          ports:
+#            - 27017:27017
+#Orders
+    mongoOrders:
+          image: mongo
+          networks:
+            - backend
+          restart: always
+#          ports:
+#            - 27016:27017
+#Shopping Cart
+    mongoShoppingCart:
+          image: mongo
+          networks:
+            - backend
+          restart: always
+          command: mongod --port 27017 --bind_ip_all
+#          ports:
+#            - 27018:27017
+#Helpdesk
+    mongoHelpDesk:
+          image: mongo
+          networks:
+            - backend
+          restart: always
+          command: mongod --port 27017 --bind_ip_all
+#          ports:
+#            - 27019:27017
+#Logistics
+    mongoLogistics:
+          image: mongo
+          networks:
+            - backend
+          restart: always
+          command: mongod --port 27017 --bind_ip_all
+#          ports:
+#            - 27020:27017
+#Inventory
+    mongoInventory:
+          image: mongo
+          networks:
+            - backend
+          restart: always
+          command: mongod --port 27017 --bind_ip_all
+#          ports:
+#            - 27021:27017
+#Logging
+    mongoLogging:
+          image: mongo
+          networks:
+            - backend
+          restart: always
+          command: mongod --port 27017 --bind_ip_all
+#          ports:
+#            - 27022:27017
+
+#Logging
+    mongoAccountRead:
+          image: mongo
+          networks:
+            - backend
+          restart: always
+          command: mongod --port 27017 --bind_ip_all
+#          ports:
+#            - 27022:27017
+
+networks:
+  backend:
+    name: amabol
+    driver: "bridge"
