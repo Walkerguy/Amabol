@@ -7,7 +7,6 @@ module.exports.createAccount = function(msg){
     var new_account = new Account({
         id: account.id,
         name: account.name,
-        password: account.password,
         adress: account.adress,
         postalcode: account.postalcode,
         city: account.city,

@@ -10,10 +10,6 @@ const AccountSchema = new Schema({
         type: String,
         required: true
     },
-    password: {
-        type: String,
-        required: false
-    },
     adress: {
         type: String,
         required: true
