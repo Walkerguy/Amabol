@@ -9,8 +9,7 @@ const OrderSchema = new Schema({
 
     // Who made the order.
     buyer:{
-        type: Schema.Types.ObjectId,
-        ref: "Account"
+        type: String
     },
 
     // Status options: 'Processing.', 'Confirmed.', 'Delivery sent.'.

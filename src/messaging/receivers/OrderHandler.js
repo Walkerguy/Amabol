@@ -159,19 +159,31 @@ function createAccount(msg){
 function updateAccount(msg){
   var update = JSON.parse(msg.content.toString());
   var id = update.id;
-
-  Account.updateOne({ id: id }, update);
+  Account.updateOne({ id: id },{ $set :
+    {
+      id: update.id,
+      name: update.name,
+      address: update.address,
+      postalcode: update.postalcode,
+      city: update.city,
+      email: update.email,
+      phone: update.phone,
+      type: update.type,
+    } }).then(function (newAccount){
+      console.log(newAccount);
+  }).catch((error) => {
+      console.log(error);
+  });
 }
 
 function deleteAccount(msg){
-  var remove = JSON.parse(msg.content.toString());
-  var id = remove.id;
-
-  Account.deleteOne({ id: id }, { 
-    if (err){
-      console.log(err);
-    }
-  });
+  Account.findOneAndDelete({ 'id' : req.params.id})
+    .then(function (res) {
+        res.status(200).json({"msg": 'account deleted'});
+    })
+    .catch((error) => {
+        res.status(400).json(error);
+    });
 }
 
 // All product functions.
@@ -197,6 +209,15 @@ function createProduct(msg){
 function updateProduct(msg){
   var update = JSON.parse(msg.content.toString());
   var id = update.id;
-
-  Product.updateOne({ id: id }, update);
+  Product.updateOne({ id: id },{ $set :
+    {
+      amount : update.newValue.amount,
+      name: update.newValue.name,
+      description : update.newValue.description,
+      price: update.newValue.price
+    } }).then(function (newProduct){
+      console.log(newProduct);
+  }).catch((error) => {
+      console.log(error);
+  });
 }
