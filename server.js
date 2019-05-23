@@ -1,9 +1,5 @@
 var express = require('express');
 var app = express();
-
-var events = require('./routes/event.route');
-
-var receiveController = require('./src/controllers/AllMessagesHandler');
 var Topics = ['product.#','shoppingcart.#','account.#','order.#']
 
 var bodyParser = require('body-parser');
