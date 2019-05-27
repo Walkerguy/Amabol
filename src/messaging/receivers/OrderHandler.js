@@ -6,7 +6,7 @@ var Shoppingcart    = require('../../models/Shoppingcart');
 
 var OrderPublisher = require('../publishers/OrderPublisher');
 
-exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
+exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@rabbitmq-server:5672', function(error0, connection) {
     if (error0) {
         throw error0;
       }
