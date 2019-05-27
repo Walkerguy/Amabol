@@ -2,7 +2,7 @@ var express = require('express');
 var routes = express.Router();
 var mongodb = require('../config/mongo.db');
 var Product = require('../models/Product');
-var TopicPublisher = require('../controllers/TopicPublisher');
+var TopicPublisher = require('../messaging/TopicPublisher');
 var uuidv1 = require('uuid/v1');
 
 routes.get('/products', function (req, res) {
