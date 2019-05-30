@@ -45,6 +45,7 @@ routes.post('/products', function(req, res) {
     });
 });
 
+// Update.
 routes.put('/products/:id', function(req, res) {
     var id = req.params.id;
 
@@ -63,14 +64,22 @@ routes.put('/products/:id', function(req, res) {
         });
 });
 
+// Delete.
 routes.delete('/products/:id', function (req, res) {
-    Product.findOneAndDelete({ 'id' : req.params.id})
-        .then(function (res) {
-            res.status(200).json({"msg": 'product deleted'});
-            TopicPublisher.sendMessageWithTopic(JSON.stringify({ "id" : req.params.id}),"product.deleted");
+    var id = req.params.id;
+
+    Product.find({ 'id' : id })
+        .then(function (product) {
+            Product.deleteOne({ 'id' : id }).then(function (res){
+                res.status(200).json({"msg": 'product deleted'});
+                var msg = { 'id': id, 'oldValue' : product, 'newValue' : res}
+                TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.deleted");
+            }).catch((error) => {
+                console.log(error);
+            });
         })
         .catch((error) => {
-            res.status(400).json(error);
+            console.log(error);
         });
 });
 
