@@ -85,7 +85,21 @@ routes.delete('/products/:id', function (req, res) {
 
 
 // Trackback, give a timestamp and this will do the opposite of all the event up until that time.
+routes.post('/products/backtrack/:minutes', function (req, res) {
+    subtract = new Number(req.params.minutes);
+    // New date.
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
+    console.log(date + ' ' + time);
+    // Subtract the amount of minutes.
+    var modifiedtime = time.getMinutes() - subtract;
+    var modifiedTimestamp = date + ' ' + modifiedtime;
+    console.log(modifiedTimestamp);
+
+    res.send("finished");
+});
 
 
 // Trackback, delete the database and rebuild up until now.
