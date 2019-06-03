@@ -1,6 +1,6 @@
 var amqp = require('amqplib/callback_api');
-var mongodb = require('./../../config/mongo.db');
-var Event = require('./../../model/event.model');
+var mongodb = require('./../config/mongo.db');
+var Event = require('../models/Event');
 
 exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
   if (error0) {
@@ -31,14 +31,11 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
 
       channel.consume(q.queue, function(msg) {
 
-        var today = new Date();
-        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        var dateTime = date + ' ' + time;
+        console.log(msg);
 
         const event = {
           event: msg.content.toString(),
-          date: dateTime,
+          date: msg.content.timestamp,
           topic: msg.fields.routingKey
         }
 
@@ -48,7 +45,9 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
           })
 
         console.log("[Product Queue] %s:'%s'", msg.fields.routingKey, msg.content.toString());
-      }, {
+      }, 
+      
+      {
         noAck: true
       });
     });

@@ -14,7 +14,16 @@ module.exports.sendMessageWithTopic =  function(msg,key) {
         channel.assertExchange(exchange, 'topic', {
           durable: true
         });
-        channel.publish(exchange, key, Buffer.from(msg));
+
+        // Create timestamp.
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var dateTime = date + ' ' + time;
+
+        console.log((msg, { 'timestamp': dateTime }));
+
+        channel.publish(exchange, key, Buffer.from(msg, { 'timestamp': dateTime }));
         console.log(" [x] Sent %s:'%s'", key, msg);
         //res.send('<h1> Topic' + key + ' Send: ' + msg + '</h1>');
       });

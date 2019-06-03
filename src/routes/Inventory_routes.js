@@ -27,6 +27,7 @@ routes.get('/products/:id', function (req, res) {
 });
 
 routes.post('/products', function(req, res) {
+    
     var new_product = new Product({
         id: uuidv1(),
         name: req.body.name,
@@ -85,6 +86,28 @@ routes.delete('/products/:id', function (req, res) {
 
 
 // Trackback, give a timestamp and this will do the opposite of all the event up until that time.
+// routes.update('/products/backtrackevents/', function (req, res) {
+//     // Timestamp from body; HH (hours to track back on)
+//     Date 
+
+//     Product.find({ 'id' : id })
+//         .then(function (product) {
+//             Product.deleteOne({ 'id' : id }).then(function (res){
+//                 res.status(200).json({"msg": 'product deleted'});
+//                 var msg = { 'id': id, 'oldValue' : product, 'newValue' : res}
+//                 TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.deleted");
+//             }).catch((error) => {
+//                 console.log(error);
+//             });
+//         })
+//         .catch((error) => {
+//             console.log(error);
+//         });
+// });
+
+
+
+
 
 
 
@@ -93,19 +116,19 @@ routes.delete('/products/:id', function (req, res) {
 // Then we refill the product collection by going through the event history
 // Then we compare the two collections (do they have the same amount of records?)
 // Then we delete productold.
-var passphrase = uuidv1();
-routes.delete('/products/rebuilddatabase/:passphrase', function (req, res) {
+// var passphrase = uuidv1();
+// routes.delete('/products/rebuilddatabase/:passphrase', function (req, res) {
 
-    // Use a passphrase check to make sure a database wipe is alright.
-    if (req.params.passphrase == passphrase)
-    {
-        //LETS DELETE SOME STUFF HERE
-        Product.deleteMany({}).then(function)
-    }
+//     // Use a passphrase check to make sure a database wipe is alright.
+//     if (req.params.passphrase == passphrase)
+//     {
+//         //LETS DELETE SOME STUFF HERE
+//         Product.deleteMany({}).then(function)
+//     }
 
-    else{
-        res.send("Are you sure you want to rebuild the inventory service's database? Add this to the URL if you're sure " + passphrase)
-    }
-});
+//     else{
+//         res.send("Are you sure you want to rebuild the inventory service's database? Add this to the URL if you're sure " + passphrase)
+//     }
+// });
 
 module.exports = routes;
