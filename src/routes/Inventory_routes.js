@@ -28,6 +28,7 @@ routes.get('/products/:id', function (req, res) {
 
 routes.post('/products', function(req, res) {
     
+    
     var new_product = new Product({
         id: uuidv1(),
         name: req.body.name,

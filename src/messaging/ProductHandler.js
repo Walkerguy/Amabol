@@ -32,10 +32,15 @@ exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@1
       channel.consume(q.queue, function(msg) {
 
         console.log(msg);
+        // Create timestamp.
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var dateTime = date + ' ' + time;
 
         const event = {
           event: msg.content.toString(),
-          date: msg.content.timestamp,
+          date: dateTime,
           topic: msg.fields.routingKey
         }
 
