@@ -2,7 +2,7 @@ var amqp = require('amqplib/callback_api');
 var Product = require('../models/Product');
 var TopicPublisher = require('./TopicPublisher');
 
-exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@128.199.61.247', function(error0, connection) {
+exports.listen = function(exchange,topics) {amqp.connect('amqp://admin:Welkom1@rabbitmq-server:5672/', function(error0, connection) {
     if (error0) {
         throw error0;
       }

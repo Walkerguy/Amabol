@@ -27,8 +27,6 @@ routes.get('/products/:id', function (req, res) {
 });
 
 routes.post('/products', function(req, res) {
-    
-    
     var new_product = new Product({
         id: uuidv1(),
         name: req.body.name,
@@ -84,5 +82,30 @@ routes.delete('/products/:id', function (req, res) {
             console.log(error);
         });
 });
+
+
+// Trackback, give a timestamp and this will do the opposite of all the event up until that time.
+
+
+
+// Trackback, delete the database and rebuild up until now.
+// First; we rename the current collection to something else like productold
+// Then we refill the product collection by going through the event history
+// Then we compare the two collections (do they have the same amount of records?)
+// Then we delete productold.
+// var passphrase = uuidv1();
+// routes.delete('/products/rebuilddatabase/:passphrase', function (req, res) {
+
+//     // Use a passphrase check to make sure a database wipe is alright.
+//     if (req.params.passphrase == passphrase)
+//     {
+//         //LETS DELETE SOME STUFF HERE
+//         Product.deleteMany({}).then(function)
+//     }
+
+//     else{
+//         res.send("Are you sure you want to rebuild the inventory service's database? Add this to the URL if you're sure " + passphrase)
+//     }
+// });
 
 module.exports = routes;
