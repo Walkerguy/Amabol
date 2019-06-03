@@ -2,6 +2,7 @@ var express = require('express');
 var routes = express.Router();
 var mongodb = require('../config/mongo.db');
 var Product = require('../models/Product');
+var Event = require('../models/Event');
 var TopicPublisher = require('../messaging/TopicPublisher');
 var uuidv1 = require('uuid/v1');
 
@@ -89,16 +90,26 @@ routes.post('/products/backtrack/:minutes', function (req, res) {
     subtract = new Number(req.params.minutes);
     // New date.
     var today = new Date();
+    console.log(today);
+
+    today.setMinutes(today.getMinutes() - subtract);
     var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
-    console.log(date + ' ' + time);
     // Subtract the amount of minutes.
-    var modifiedtime = time.getMinutes() - subtract;
-    var modifiedTimestamp = date + ' ' + modifiedtime;
-    console.log(modifiedTimestamp);
+    var modifiedTimestamp = date + ' ' + time;
 
-    res.send("finished");
+    Testdate = new Date(modifiedTimestamp);
+    console.log(Testdate);
+
+    // Get and return all events.
+    Event.find()
+        .then(function (events) {
+            res.status(200).json(events);
+        })
+        .catch((error) => {
+            res.status(400).json(error);
+        }); 
 });
 
 
