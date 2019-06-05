@@ -2,7 +2,8 @@ var express = require('express');
 var routes = express.Router();
 var mongodb = require('../config/mongo.db');
 var Product = require('../models/Product');
-var TopicPublisher = require('../controllers/TopicPublisher');
+var Event = require('../models/Event');
+var TopicPublisher = require('../messaging/TopicPublisher');
 var uuidv1 = require('uuid/v1');
 
 routes.get('/products', function (req, res) {
@@ -45,6 +46,7 @@ routes.post('/products', function(req, res) {
     });
 });
 
+// Update.
 routes.put('/products/:id', function(req, res) {
     var id = req.params.id;
 
@@ -63,15 +65,129 @@ routes.put('/products/:id', function(req, res) {
         });
 });
 
+// Delete.
 routes.delete('/products/:id', function (req, res) {
-    Product.findOneAndDelete({ 'id' : req.params.id})
-        .then(function (res) {
-            res.status(200).json({"msg": 'product deleted'});
-            TopicPublisher.sendMessageWithTopic(JSON.stringify({ "id" : req.params.id}),"product.deleted");
+    var id = req.params.id;
+
+    Product.find({ 'id' : id })
+        .then(function (product) {
+            Product.deleteOne({ 'id' : id }).then(function (res){
+                res.status(200).json({"msg": 'product deleted'});
+                var msg = { 'id': id, 'oldValue' : product}
+                TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.deleted");
+            }).catch((error) => {
+                console.log(error);
+            });
         })
         .catch((error) => {
-            res.status(400).json(error);
+            console.log(error);
         });
 });
+
+
+// Trackback, give a timestamp and this will do the opposite of all the event up until that time.
+routes.post('/products/backtrack/:minutes', function (req, res) {
+    subtract = new Number(req.params.minutes);
+    // New date.
+    var today = new Date();
+    console.log(today);
+
+    today.setMinutes(today.getMinutes() - subtract);
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+    // Subtract the amount of minutes.
+    var modifiedTimestamp = date + ' ' + time;
+
+    Testdate = new Date(modifiedTimestamp);
+    console.log(Testdate);
+
+    getEventsBeforeDate(Testdate);
+    
+    
+});
+
+function deleteAllData(){
+    Product.deleteMany()
+        .then(function (response) {
+            console.log(response);
+            console.log("all data deleted from Products")
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+}
+
+function getEventsBeforeDate(date){
+    // Get and return all events.
+    Event.find()
+        .then(function (events) {
+            for(var i =0;i < events.length; i++){
+                console.log(events[i].date);
+                if((events[i].date < date)){
+                    console.log(events[i]);
+                }
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        }); 
+}
+
+function revertCreateEvent(event){
+    var eventJSON = JSON.parse(event.event)
+    Product.findOneAndDelete({'id': eventJSON.id})
+        .then(function (response) {
+            console.log("product with id: " + eventJSON.id + "deleted");
+        })
+        .catch((error) => {
+            console.log(error);
+        }); 
+}
+
+function revertUpdateEvent(event){
+    var eventJSON = JSON.parse(event.event)
+    Product.findOneAndUpdate({ 'id':eventJSON.id},{ $set : eventJSON.oldValue })
+    .then(function (response) {
+        console.log(response);
+        console.log("product with id: " + eventJSON.id + "edited");
+    })
+    .catch((error) => {
+        console.log(error);
+    }); 
+}
+
+function revertDeleteEvent(event){
+    var eventJSON = JSON.parse(event.event)
+    Product.create( eventJSON.oldValue )
+    .then(function (response) {
+        console.log(response);
+        console.log("product with id: " + eventJSON.id + "created");
+    })
+    .catch((error) => {
+        console.log(error);
+    }); 
+}
+
+
+// Trackback, delete the database and rebuild up until now.
+// First; we rename the current collection to something else like productold
+// Then we refill the product collection by going through the event history
+// Then we compare the two collections (do they have the same amount of records?)
+// Then we delete productold.
+// var passphrase = uuidv1();
+// routes.delete('/products/rebuilddatabase/:passphrase', function (req, res) {
+
+//     // Use a passphrase check to make sure a database wipe is alright.
+//     if (req.params.passphrase == passphrase)
+//     {
+//         //LETS DELETE SOME STUFF HERE
+//         Product.deleteMany({}).then(function)
+//     }
+
+//     else{
+//         res.send("Are you sure you want to rebuild the inventory service's database? Add this to the URL if you're sure " + passphrase)
+//     }
+// });
 
 module.exports = routes;

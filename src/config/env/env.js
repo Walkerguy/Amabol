@@ -1,7 +1,7 @@
 var env = {
     webPort: '3000',
     dbHost: 'mongoInventory',
-    dbPort: '27021',
+    dbPort: '27017',
     dbUser: '',
     dbPassword: '',
     dbDatabase: 'inventory'
