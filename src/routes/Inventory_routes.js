@@ -103,35 +103,41 @@ routes.post('/products/backtrack/:minutes', function (req, res) {
     console.log(Testdate);
 
     getEventsBeforeDate(Testdate);
-    
-    
 });
 
-function deleteAllData(){
-    Product.deleteMany()
-        .then(function (response) {
-            console.log(response);
-            console.log("all data deleted from Products")
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-}
-
 function getEventsBeforeDate(date){
+    // We'll be adding to this array all the events that happened within the timerange.
+    var eventsToRevert = [];
+
     // Get and return all events.
     Event.find()
         .then(function (events) {
             for(var i =0;i < events.length; i++){
                 console.log(events[i].date);
-                if((events[i].date < date)){
+                
+                // If an event date is HIGHER than our given timestamp, it gets added to the array.
+                if((events[i].date > date)){
                     console.log(events[i]);
+                    eventsToRevert.push(events[i]);
                 }
             }
         })
         .catch((error) => {
             console.log(error);
         }); 
+
+        for (var i = 0; i < eventsToRevert.length; i++)
+        {
+            if(eventsToRevert[i].topic == "product.created"){
+                revertCreateEvent(eventsToRevert[i]);
+            }
+            if(eventsToRevert[i].topic == "product.updated"){
+                revertUpdateEvent(eventsToRevert[i]);
+            }
+            if(eventsToRevert[i].topic == "product.deleted"){
+                revertDeleteEvent(eventsToRevert[i]);
+            }
+        }
 }
 
 function revertCreateEvent(event){
@@ -170,24 +176,89 @@ function revertDeleteEvent(event){
 }
 
 
-// Trackback, delete the database and rebuild up until now.
-// First; we rename the current collection to something else like productold
-// Then we refill the product collection by going through the event history
-// Then we compare the two collections (do they have the same amount of records?)
-// Then we delete productold.
-// var passphrase = uuidv1();
-// routes.delete('/products/rebuilddatabase/:passphrase', function (req, res) {
+// Rebuild database from ALL events.
+routes.delete('/products/rebuilddatabase/', function (req, res) {
 
-//     // Use a passphrase check to make sure a database wipe is alright.
-//     if (req.params.passphrase == passphrase)
-//     {
-//         //LETS DELETE SOME STUFF HERE
-//         Product.deleteMany({}).then(function)
-//     }
+    // Rename current database as a backup.
+    try {
+        mongodb.product.rename("productbackup", function(err, collection) {});
+    } 
+    catch(err) 
+    {
+        console.log(err);
+    }
 
-//     else{
-//         res.send("Are you sure you want to rebuild the inventory service's database? Add this to the URL if you're sure " + passphrase)
-//     }
-// });
+    // Get all events and start rebuilding products.
+    Event.find()
+        .then(function (events) {
+            for(var i =0;i < events.length; i++){
+
+                // Re-create.
+                if(events[i].topic == "product.created"){
+                    var eventJSON = JSON.parse(event[i].event)
+                    var newProduct = new Product(eventJSON);
+                    newProduct.save(function(err) {
+                        if (err){
+                            console.log(err);
+                        }
+                        console.log("[REBUILD] - Product re-created.")
+                    });
+                }
+
+                // Re-update.
+                if(events[i].topic == "product.updated"){
+                    var eventJSON = JSON.parse(event[i].event)
+                    Product.find({ 'id' : eventJSON.oldValue.id })
+                    .then(function (product) {
+                        Product.updateOne({ id: eventJSON.newValue.id },{ $set : eventJSON.newValue }).then(function (newProduct){
+                            console.log("[REBUILD] - Product re-updated.")
+                        }).catch((error) => {
+                            console.log(error);
+                        });
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+                }
+
+                // Re-delete.
+                if(events[i].topic == "product.deleted"){
+                    var eventJSON = JSON.parse(event[i].event)
+                    Product.deleteOne({ 'id' : eventJSON.id }).then(function (res){
+                        console.log("[REBUILD] - Product re-deleted.")
+                    }).catch((error) => {
+                        console.log(error);
+                    });
+                }
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        }); 
+
+
+
+    // compare collections here.
+    Product.count({}, function(err, count){
+        console.log( "[REBUILD] - Amount of records: ", count );
+    });
+
+    mongodb.productbackup.count({}, function(err, count){
+        console.log( "[BACKUP] - Amount of records: ", count );
+    });
+
+    res.send("Database rebuilt.");
+});
+
+function deleteAllData(){
+    Product.deleteMany()
+        .then(function (response) {
+            console.log(response);
+            console.log("all data deleted from Products")
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+}
 
 module.exports = routes;
