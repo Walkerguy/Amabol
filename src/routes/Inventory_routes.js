@@ -48,14 +48,19 @@ routes.post('/products', function(req, res) {
 
 // Update.
 routes.put('/products/:id', function(req, res) {
-    var id = req.params.id;
+    var productid = req.params.id;
 
-    Product.find({ 'id' : id })
+    Product.findOne({ 'id' : productid })
         .then(function (product) {
-            Product.updateOne({ id: id },{ $set : req.body }).then(function (newProduct){
-                res.status(200).json(req.body);
-                var msg = { 'id': id, 'oldValue' : product, 'newValue' : req.body}
-                TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.updated");
+            Product.updateOne({ 'id': productid },{ $set : req.body }).then(function (updated){
+                Product.findOne({ 'id' : productid })
+                .then(function (newProduct){
+                    res.status(200).json(newProduct);
+                    var msg = { 'id': productid, 'oldValue' : product, 'newValue' : newProduct}
+                    TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.updated");
+                });
+                
+                
             }).catch((error) => {
                 console.log(error);
             });
@@ -71,7 +76,7 @@ routes.delete('/products/:id', function (req, res) {
 
     Product.find({ 'id' : id })
         .then(function (product) {
-            Product.deleteOne({ 'id' : id }).then(function (res){
+            Product.deleteOne({ 'id' : id }).then(function (newProduct){
                 res.status(200).json({"msg": 'product deleted'});
                 var msg = { 'id': id, 'oldValue' : product}
                 TopicPublisher.sendMessageWithTopic(JSON.stringify(msg),"product.deleted");
@@ -90,7 +95,6 @@ routes.post('/products/backtrack/:minutes', function (req, res) {
     subtract = new Number(req.params.minutes);
     // New date.
     var today = new Date();
-    console.log(today);
 
     today.setMinutes(today.getMinutes() - subtract);
     var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
@@ -100,45 +104,52 @@ routes.post('/products/backtrack/:minutes', function (req, res) {
     var modifiedTimestamp = date + ' ' + time;
 
     Testdate = new Date(modifiedTimestamp);
-    console.log(Testdate);
 
-    getEventsBeforeDate(Testdate);
+   // We'll be adding to this array all the events that happened within the timerange.
+   var eventsToRevert = [];
+   modifiedtimestamp = new Date(Testdate);
+
+   // Get and return all events.
+   Event.find()
+       .then(function (events) {
+           for(var i =0;i < events.length; i++){
+               console.log("All existing events: " + events[i].date);
+               // If an event date is HIGHER than our given timestamp, it gets added to the array.
+
+               eventdate = new Date(events[i].date);
+
+               if((eventdate > modifiedtimestamp)){
+                   console.log("REVERTABLE EVENT " + events[i]);
+                   eventsToRevert.push(events[i]);
+               }
+
+               
+           }
+
+           for (var i = 0; i < eventsToRevert.length; i++)
+           {
+               if(eventsToRevert[i].topic == "product.created"){
+                   console.log("We're in the revert CREATE now.");
+                   revertCreateEvent(eventsToRevert[i]);
+               }
+               if(eventsToRevert[i].topic == "product.updated"){
+                    console.log("We're in the revert UPDATE now.");
+                   revertUpdateEvent(eventsToRevert[i]);
+               }
+               if(eventsToRevert[i].topic == "product.deleted"){
+                   console.log("We're in the revert DELETE now.");
+                   revertDeleteEvent(eventsToRevert[i]);
+               }
+           }
+           res.status(200).json("Amount of events replayed/reverted: " + eventsToRevert.length);
+
+       })
+       .catch((error) => {
+           console.log(error);
+       }); 
+
 });
 
-function getEventsBeforeDate(date){
-    // We'll be adding to this array all the events that happened within the timerange.
-    var eventsToRevert = [];
-
-    // Get and return all events.
-    Event.find()
-        .then(function (events) {
-            for(var i =0;i < events.length; i++){
-                console.log(events[i].date);
-                
-                // If an event date is HIGHER than our given timestamp, it gets added to the array.
-                if((events[i].date > date)){
-                    console.log(events[i]);
-                    eventsToRevert.push(events[i]);
-                }
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-        }); 
-
-        for (var i = 0; i < eventsToRevert.length; i++)
-        {
-            if(eventsToRevert[i].topic == "product.created"){
-                revertCreateEvent(eventsToRevert[i]);
-            }
-            if(eventsToRevert[i].topic == "product.updated"){
-                revertUpdateEvent(eventsToRevert[i]);
-            }
-            if(eventsToRevert[i].topic == "product.deleted"){
-                revertDeleteEvent(eventsToRevert[i]);
-            }
-        }
-}
 
 function revertCreateEvent(event){
     var eventJSON = JSON.parse(event.event)
@@ -153,9 +164,18 @@ function revertCreateEvent(event){
 
 function revertUpdateEvent(event){
     var eventJSON = JSON.parse(event.event)
-    Product.findOneAndUpdate({ 'id':eventJSON.id},{ $set : eventJSON.oldValue })
+
+    console.log("ID: " + eventJSON.id);
+    console.log(eventJSON);
+    console.log("Oldervalue " + eventJSON.oldValue);
+
+    Product.updateOne({ 'id': eventJSON.id}, {$set : eventJSON.oldValue})
     .then(function (response) {
-        console.log(response);
+        console.log(eventJSON.oldValue.name);
+        console.log(eventJSON.newValue.name);
+
+
+        console.log(eventJSON);
         console.log("product with id: " + eventJSON.id + "edited");
     })
     .catch((error) => {
