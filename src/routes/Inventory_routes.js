@@ -122,8 +122,6 @@ routes.post('/products/backtrack/:minutes', function (req, res) {
                    console.log("REVERTABLE EVENT " + events[i]);
                    eventsToRevert.push(events[i]);
                }
-
-               
            }
 
            for (var i = 0; i < eventsToRevert.length; i++)
@@ -197,25 +195,64 @@ function revertDeleteEvent(event){
 
 
 // Rebuild database from ALL events.
-routes.delete('/products/rebuilddatabase/', function (req, res) {
+routes.delete('/products/rebuilddatabase/yes', function (req, res) {
 
-    // Rename current database as a backup.
-    try {
-        mongodb.product.rename("productbackup", function(err, collection) {});
-    } 
-    catch(err) 
-    {
-        console.log(err);
-    }
+    // Empty database.
+    Product.deleteMany()
+        .then(function (response) {
+            console.log(response);
+            console.log("all data deleted from Products")
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+
+    /*subtract = new Number(req.body.minutes);
+    // New date.
+    var today = new Date();
+
+    today.setMinutes(today.getMinutes() - subtract);
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+    // Subtract the amount of minutes.
+    var modifiedTimestamp = date + ' ' + time;
+
+    Testdate = new Date(modifiedTimestamp);
+
+    // We'll be adding to this array all the events that happened within the timerange.*/
+    var eventsToRevert = [];
+
+    var modifiedtimestamp = new Date();
+    modifiedtimestamp = Date.parse(req.body.date);
+
+
+
+
+    
 
     // Get all events and start rebuilding products.
     Event.find()
         .then(function (events) {
             for(var i =0;i < events.length; i++){
+                console.log("All existing events: " + events[i].date);
+                // If an event date is HIGHER than our given timestamp, it gets added to the array.
+ 
+                eventdate = new Date(events[i].date);
+                console.log("EVENT DATE: " + eventdate);
+                console.log("MODIFIEDTIMESTAMP: " + modifiedtimestamp);
+ 
+                if((eventdate < modifiedtimestamp)){
+                    console.log("REVERTABLE EVENT " + events[i]);
+                    eventsToRevert.push(events[i]);
+                }
+            }
 
+            for(var i=0; i < eventsToRevert.length; i++){
                 // Re-create.
-                if(events[i].topic == "product.created"){
-                    var eventJSON = JSON.parse(event[i].event)
+                if(eventsToRevert[i].topic == "product.created"){
+                    var eventJSON = JSON.parse(eventsToRevert[i].event)
                     var newProduct = new Product(eventJSON);
                     newProduct.save(function(err) {
                         if (err){
@@ -226,8 +263,8 @@ routes.delete('/products/rebuilddatabase/', function (req, res) {
                 }
 
                 // Re-update.
-                if(events[i].topic == "product.updated"){
-                    var eventJSON = JSON.parse(event[i].event)
+                if(eventsToRevert[i].topic == "product.updated"){
+                    var eventJSON = JSON.parse(eventsToRevert[i].event)
                     Product.find({ 'id' : eventJSON.oldValue.id })
                     .then(function (product) {
                         Product.updateOne({ id: eventJSON.newValue.id },{ $set : eventJSON.newValue }).then(function (newProduct){
@@ -242,8 +279,8 @@ routes.delete('/products/rebuilddatabase/', function (req, res) {
                 }
 
                 // Re-delete.
-                if(events[i].topic == "product.deleted"){
-                    var eventJSON = JSON.parse(event[i].event)
+                if(eventsToRevert[i].topic == "product.deleted"){
+                    var eventJSON = JSON.parse(eventsToRevert[i].event)
                     Product.deleteOne({ 'id' : eventJSON.id }).then(function (res){
                         console.log("[REBUILD] - Product re-deleted.")
                     }).catch((error) => {
@@ -251,6 +288,8 @@ routes.delete('/products/rebuilddatabase/', function (req, res) {
                     });
                 }
             }
+
+                
         })
         .catch((error) => {
             console.log(error);
@@ -258,27 +297,16 @@ routes.delete('/products/rebuilddatabase/', function (req, res) {
 
 
 
-    // compare collections here.
-    Product.count({}, function(err, count){
+    /* compare collections here.
+    Product.countDocuments({}, function(err, count){
         console.log( "[REBUILD] - Amount of records: ", count );
     });
 
-    mongodb.productbackup.count({}, function(err, count){
+    mongodb.productbackup.countDocuments({}, function(err, count){
         console.log( "[BACKUP] - Amount of records: ", count );
-    });
+    });*/
 
     res.send("Database rebuilt.");
 });
-
-function deleteAllData(){
-    Product.deleteMany()
-        .then(function (response) {
-            console.log(response);
-            console.log("all data deleted from Products")
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-}
 
 module.exports = routes;
